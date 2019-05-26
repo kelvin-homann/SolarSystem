@@ -46,7 +46,7 @@
     <ClCompile Include="..\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="shaders.cpp">
+    <ClCompile Include="shader.cpp">
       <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -72,13 +72,10 @@
     <ClInclude Include="..\imgui_impl_opengl3.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>sources\header</Filter>
-    </ClInclude>
     <ClInclude Include="sphere.h">
       <Filter>sources\header</Filter>
     </ClInclude>
-    <ClInclude Include="shaders.h">
+    <ClInclude Include="shader.h">
       <Filter>sources\header</Filter>
     </ClInclude>
   </ItemGroup>

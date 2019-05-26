@@ -6,13 +6,36 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <GL/gl3w.h> 
+#include <GL/gl3w.h>
+#include "shader.h"
+#include <iostream>
+
+Shader::Shader() {};
+
+Shader::Shader(const char* vertexPath, const char* fragmentPath) {    
+    vertex_shader = CreateShader(vertexPath, GL_VERTEX_SHADER);
+    fragment_shader = CreateShader(fragmentPath, GL_FRAGMENT_SHADER);
+
+    GLint link_ok = GL_FALSE;
+
+    // Creating the Shader Program
+    shader_program = glCreateProgram();
+    glAttachShader(shader_program, vertex_shader);
+    glAttachShader(shader_program, fragment_shader);
+    glLinkProgram(shader_program);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &link_ok);
+    if (!link_ok) {
+        fprintf(stderr, "glLinkProgram:");
+        PrintLog(shader_program);
+    }
+}
+
 
 /**
  * Store all the file's contents in memory, useful to pass shaders
  * source code to OpenGL
  */
-char* file_read(const char* filename)
+char* Shader::FileRead(const char* filename)
 {
   FILE* in = fopen(filename, "rb");
   if (in == NULL) return NULL;
@@ -40,7 +63,7 @@ char* file_read(const char* filename)
 /**
  * Display compilation errors from the OpenGL shader compiler
  */
-void print_log(GLuint object)
+void Shader::PrintLog(GLuint object)
 {
   GLint log_length = 0;
   if (glIsShader(object))
@@ -66,9 +89,10 @@ void print_log(GLuint object)
 /**
  * Compile the shader from file 'filename', with error handling
  */
-GLuint create_shader(const char* filename, GLenum type)
+GLuint Shader::CreateShader(const char* filename, GLenum type)
 {
-  const GLchar* source = file_read(filename);
+  const GLchar* source = FileRead(filename);
+
   if (source == NULL) {
     fprintf(stderr, "Error opening %s: ", filename); perror("");
     return 0;
@@ -110,7 +134,7 @@ GLuint create_shader(const char* filename, GLenum type)
   glGetShaderiv(res, GL_COMPILE_STATUS, &compile_ok);
   if (compile_ok == GL_FALSE) {
     fprintf(stderr, "%s:", filename);
-    print_log(res);
+    PrintLog(res);
     glDeleteShader(res);
     return 0;
   }
@@ -118,19 +142,19 @@ GLuint create_shader(const char* filename, GLenum type)
   return res;
 }
 
-GLuint create_program(const char *vertexfile, const char *fragmentfile) {
+GLuint Shader::CreateProgram(const char *vertexfile, const char *fragmentfile) {
 	GLuint program = glCreateProgram();
 	GLuint shader;
 
 	if(vertexfile) {
-		shader = create_shader(vertexfile, GL_VERTEX_SHADER);
+		shader = CreateShader(vertexfile, GL_VERTEX_SHADER);
 		if(!shader)
 			return 0;
 		glAttachShader(program, shader);
 	}
 
 	if(fragmentfile) {
-		shader = create_shader(fragmentfile, GL_FRAGMENT_SHADER);
+		shader = CreateShader(fragmentfile, GL_FRAGMENT_SHADER);
 		if(!shader)
 			return 0;
 		glAttachShader(program, shader);
@@ -141,7 +165,7 @@ GLuint create_program(const char *vertexfile, const char *fragmentfile) {
 	glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
 	if (!link_ok) {
 		fprintf(stderr, "glLinkProgram:");
-		print_log(program);
+		PrintLog(program);
 		glDeleteProgram(program);
 		return 0;
 	}
@@ -150,19 +174,19 @@ GLuint create_program(const char *vertexfile, const char *fragmentfile) {
 }
 
 #ifdef GL_GEOMETRY_SHADER
-GLuint create_gs_program(const char *vertexfile, const char *geometryfile, const char *fragmentfile, GLint input, GLint output, GLint vertices) {
+GLuint Shader::CreateGsProgram(const char *vertexfile, const char *geometryfile, const char *fragmentfile, GLint input, GLint output, GLint vertices) {
 	GLuint program = glCreateProgram();
 	GLuint shader;
 
 	if(vertexfile) {
-		shader = create_shader(vertexfile, GL_VERTEX_SHADER);
+		shader = CreateShader(vertexfile, GL_VERTEX_SHADER);
 		if(!shader)
 			return 0;
 		glAttachShader(program, shader);
 	}
 
 	if(geometryfile) {
-		shader = create_shader(geometryfile, GL_GEOMETRY_SHADER);
+		shader = CreateShader(geometryfile, GL_GEOMETRY_SHADER);
 		if(!shader)
 			return 0;
 		glAttachShader(program, shader);
@@ -173,7 +197,7 @@ GLuint create_gs_program(const char *vertexfile, const char *geometryfile, const
 	}
 
 	if(fragmentfile) {
-		shader = create_shader(fragmentfile, GL_FRAGMENT_SHADER);
+		shader = CreateShader(fragmentfile, GL_FRAGMENT_SHADER);
 		if(!shader)
 			return 0;
 		glAttachShader(program, shader);
@@ -184,7 +208,7 @@ GLuint create_gs_program(const char *vertexfile, const char *geometryfile, const
 	glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
 	if (!link_ok) {
 		fprintf(stderr, "glLinkProgram:");
-		print_log(program);
+		PrintLog(program);
 		glDeleteProgram(program);
 		return 0;
 	}
@@ -198,14 +222,14 @@ GLuint create_gs_program(const char *vertexfile, const char *geometryfile, const
 }
 #endif
 
-GLint get_attrib(GLuint program, const char *name) {
+GLint Shader::GetAttrib(GLuint program, const char *name) {
 	GLint attribute = glGetAttribLocation(program, name);
 	if(attribute == -1)
 		fprintf(stderr, "Could not bind attribute %s\n", name);
 	return attribute;
 }
 
-GLint get_uniform(GLuint program, const char *name) {
+GLint Shader::GetUniform(GLuint program, const char *name) {
 	GLint uniform = glGetUniformLocation(program, name);
 	if(uniform == -1)
 		fprintf(stderr, "Could not bind uniform %s\n", name);

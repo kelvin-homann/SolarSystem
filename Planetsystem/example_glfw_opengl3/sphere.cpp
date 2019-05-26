@@ -8,10 +8,10 @@ Sphere::Sphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* 
 	GLuint* _indices = indices;
 	float _radius = radius;
 
-	createSphere(_vertices, _normals, _texcoords, _indices, _radius);
+	CreateSphere(_vertices, _normals, _texcoords, _indices, _radius);
 }
 
-void Sphere::createSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
+void Sphere::CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
 {
 	float const R = 1. / (float)(rings - 1);
 	float const S = 1. / (float)(sectors - 1);
@@ -61,7 +61,7 @@ inline void Sphere::push_indices(GLuint* indices, int index, int sectors, int r,
 	indices[index + 5] = curRow + nextS;
 }
 
-void Sphere::setColor(glm::vec4 color)
+void Sphere::SetColor(glm::vec4 color)
 {
     _color = color;
 }

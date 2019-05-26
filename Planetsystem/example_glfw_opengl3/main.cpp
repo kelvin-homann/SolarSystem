@@ -12,7 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "shaders.h"
+#include "shader.h"
 #include "sphere.h"
 #include <iostream>
 
@@ -29,8 +29,8 @@ float cam_distance = 4.0f;
 
 ImVec4 bg_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-// Object Data
-GLuint program; // Shader Program
+// Earth Data
+//GLuint shader_program; // Shader Program
 GLint attribute_position, attribute_normals;
 GLint uniform_mvp;
 GLuint vbo_sphere_vertices;
@@ -46,10 +46,30 @@ float rot_speed = 1.0f;
 
 float elapsed_time;
 
+Shader earth_shader = Shader();
+
+void InitVBOBuffers(GLuint vbo, GLfloat* vertices)
+{
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+}
+
+void InitIboBuffers(GLuint ibo, GLuint* indices)
+{
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+}
+
+
 int InitResources()
 {
-    earth.setColor(earth_color);
-    //earth.Init(&vbo_sphere_vertices, sphere_vertices, &ibo_sphere_elements, sphere_indices);
+    earth.SetColor(earth_color);
+
+    //InitVBOBuffers(vbo_sphere_vertices, sphere_vertices);
+    //InitIboBuffers(ibo_sphere_elements, sphere_indices);
+
     glGenBuffers(1, &vbo_sphere_vertices);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
     glBufferData(GL_ARRAY_BUFFER, sizeof(sphere_vertices), sphere_vertices, GL_STATIC_DRAW);
@@ -58,40 +78,23 @@ int InitResources()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_sphere_elements);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(sphere_indices), sphere_indices, GL_STATIC_DRAW);
 
-    GLint link_ok = GL_FALSE;
+    earth_shader = Shader("sphere.v.glsl", "sphere.f.glsl");
 
-    GLuint vs, fs;
-    
-    //if ((vs = create_shader("sphere_phong.v.glsl", GL_VERTEX_SHADER)) == 0) return 0;
-    if ((vs = create_shader("sphere.v.glsl", GL_VERTEX_SHADER)) == 0) return 0;
-    if ((fs = create_shader("sphere.f.glsl", GL_FRAGMENT_SHADER)) == 0) return 0;
-
-    program = glCreateProgram();
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glGetProgramiv(program, GL_LINK_STATUS, &link_ok);
-    if (!link_ok) {
-        fprintf(stderr, "glLinkProgram:");
-        print_log(program);
-        return 0;
-    }
-
-    attribute_position = glGetAttribLocation(program, "coord3d");
-    attribute_normals = glGetAttribLocation(program, "v_color");
-    uniform_mvp = glGetUniformLocation(program, "mvp");
+    attribute_position = glGetAttribLocation(earth_shader.GetShader(), "coord3d");
+    attribute_normals = glGetAttribLocation(earth_shader.GetShader(), "v_color");
+    uniform_mvp = glGetUniformLocation(earth_shader.GetShader(), "mvp");
 
     return 1;
 }
 
 void Render()
 {
-    earth.setColor(earth_color);
+    earth.SetColor(earth_color);
     glClearColor(bg_color.x, bg_color.y, bg_color.z, bg_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(program);
-    glUniform4f(glGetUniformLocation(program, "ourColor"), earth.getColor().x, earth.getColor().y, earth.getColor().z, earth.getColor().w);
+    glUseProgram(earth_shader.GetShader());
+    glUniform4f(glGetUniformLocation(earth_shader.GetShader(), "ourColor"), earth.GetColor().x, earth.GetColor().y, earth.GetColor().z, earth.GetColor().w);
 
     glEnableVertexAttribArray(attribute_position);
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
@@ -132,7 +135,7 @@ void Render()
     glm::mat4 mvp = projection * view * model * anim;
 
     //glm::mat4 translatedmvp = modelviewprojection * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
-    glUseProgram(program);
+    glUseProgram(earth_shader.GetShader());
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 
@@ -145,15 +148,12 @@ void InitImGui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-    
-
     ImGui::Begin("Settings"); // Create a window called "Hello, world!" and append into it.
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
 
-    ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);            // Edit 1 float using a slider from 0.0f to 1.0f
-    ImGui::ColorEdit4("Color", (float*)& earth_color); // Edit 3 floats representing a color
+    ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f); 
+    ImGui::ColorEdit4("Color", (float*)& earth_color); 
 
     ImGui::Text("Stats:");
     ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
@@ -170,7 +170,7 @@ void FreeResources(GLFWwindow * window)
     ImGui::DestroyContext();
     glfwDestroyWindow(window);
     glfwTerminate();
-    glDeleteProgram(program);
+    glDeleteProgram(earth_shader.GetShader());
     glDeleteBuffers(1, &vbo_sphere_vertices);
     glDeleteBuffers(1, &ibo_sphere_elements);
 }

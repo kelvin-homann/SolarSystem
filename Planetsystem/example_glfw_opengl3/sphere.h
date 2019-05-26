@@ -15,10 +15,10 @@ class Sphere {
 	public:
 		Sphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);  // constructor
 		//~Sphere();
-		float getRadius() const { return _radius; }
-		void createSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
-        void setColor(glm::vec4 color);
-        glm::vec4 getColor() const { return _color; }
+		float GetRadius() const { return _radius; }
+		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
+        void SetColor(glm::vec4 color);
+        glm::vec4 GetColor() const { return _color; }
         void Init(GLuint *vbo, GLfloat* vertices, GLuint *ibo, GLuint* indices);
 
 	private:
