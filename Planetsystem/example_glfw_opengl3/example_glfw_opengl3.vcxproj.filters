@@ -37,9 +37,6 @@
     <ClCompile Include="..\..\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="shader_utils.cpp">
-      <Filter>sources</Filter>
-    </ClCompile>
     <ClCompile Include="sphere.cpp">
       <Filter>sources</Filter>
     </ClCompile>
@@ -48,6 +45,9 @@
     </ClCompile>
     <ClCompile Include="..\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="shaders.cpp">
+      <Filter>sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,10 +75,10 @@
     <ClInclude Include="shader.h">
       <Filter>sources\header</Filter>
     </ClInclude>
-    <ClInclude Include="shader_utils.h">
+    <ClInclude Include="sphere.h">
       <Filter>sources\header</Filter>
     </ClInclude>
-    <ClInclude Include="sphere.h">
+    <ClInclude Include="shaders.h">
       <Filter>sources\header</Filter>
     </ClInclude>
   </ItemGroup>

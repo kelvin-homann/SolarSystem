@@ -165,7 +165,7 @@
     <ClCompile Include="..\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\libs\gl3w\GL\gl3w.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shader_utils.cpp" />
+    <ClCompile Include="shaders.cpp" />
     <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -177,7 +177,7 @@
     <ClInclude Include="..\libs\gl3w\GL\gl3w.h" />
     <ClInclude Include="..\libs\gl3w\GL\glcorearb.h" />
     <ClInclude Include="shader.h" />
-    <ClInclude Include="shader_utils.h" />
+    <ClInclude Include="shaders.h" />
     <ClInclude Include="sphere.h" />
   </ItemGroup>
   <ItemGroup>
