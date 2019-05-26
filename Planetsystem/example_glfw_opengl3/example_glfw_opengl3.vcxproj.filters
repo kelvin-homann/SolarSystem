@@ -49,6 +49,9 @@
     <ClCompile Include="shader.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -76,6 +79,9 @@
       <Filter>sources\header</Filter>
     </ClInclude>
     <ClInclude Include="shader.h">
+      <Filter>sources\header</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
       <Filter>sources\header</Filter>
     </ClInclude>
   </ItemGroup>

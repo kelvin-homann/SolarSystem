@@ -7,11 +7,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "model.h"
 
 #define VERTICES_COUNT_OF_SPHERE 32*32
 #define INDICE_COUNT_OF_SPHERE 32*32*6 
 
-class Sphere {
+class Sphere : public Model {
 	public:
 		Sphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);  // constructor
 		//~Sphere();

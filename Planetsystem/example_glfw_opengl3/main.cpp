@@ -48,27 +48,9 @@ float elapsed_time;
 
 Shader earth_shader = Shader();
 
-void InitVBOBuffers(GLuint vbo, GLfloat* vertices)
-{
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
-void InitIboBuffers(GLuint ibo, GLuint* indices)
-{
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-}
-
-
 int InitResources()
 {
     earth.SetColor(earth_color);
-
-    //InitVBOBuffers(vbo_sphere_vertices, sphere_vertices);
-    //InitIboBuffers(ibo_sphere_elements, sphere_indices);
 
     glGenBuffers(1, &vbo_sphere_vertices);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
@@ -84,18 +66,20 @@ int InitResources()
     attribute_normals = glGetAttribLocation(earth_shader.GetShader(), "v_color");
     uniform_mvp = glGetUniformLocation(earth_shader.GetShader(), "mvp");
 
+
+
     return 1;
 }
 
 void Render()
 {
-    earth.SetColor(earth_color);
     glClearColor(bg_color.x, bg_color.y, bg_color.z, bg_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    earth.SetColor(earth_color);
 
     glUseProgram(earth_shader.GetShader());
     glUniform4f(glGetUniformLocation(earth_shader.GetShader(), "ourColor"), earth.GetColor().x, earth.GetColor().y, earth.GetColor().z, earth.GetColor().w);
-
+    
     glEnableVertexAttribArray(attribute_position);
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
     glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
@@ -120,11 +104,14 @@ void Render()
 
     /* Push each element in buffer_vertices to the vertex shader */
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_sphere_elements);
-    int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+    int size;
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
     glDisableVertexAttribArray(attribute_position);
     glDisableVertexAttribArray(attribute_normals);
+
+    //earth.SetModelViewProjection(screen_height, screen_width);
 
     float angle = (ImGui::GetTime() / rot_speed) * 50;
     glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0, 1, 0));
@@ -134,9 +121,9 @@ void Render()
 
     glm::mat4 mvp = projection * view * model * anim;
 
-    //glm::mat4 translatedmvp = modelviewprojection * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
-    glUseProgram(earth_shader.GetShader());
-    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+    glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
+
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(translatedmvp));
 }
 
 void InitImGui()
