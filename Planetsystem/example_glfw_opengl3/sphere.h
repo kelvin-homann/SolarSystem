@@ -15,41 +15,40 @@
 class Sphere : public Model {
 	public:
 		Sphere(float radius);  // constructor
-		//~Sphere();
+		//~Sphere(); // destructor
 		float GetRadius() const { return _radius; }
+        glm::vec4 GetColor() const { return _color; }
 		int GetVerticesSize() const { return vertices_size; }
 		int GetNormalsSize() const { return normals_size; }
 		int GetTexcoordsSize() const { return texcoords_size; }
 		int GetIndicesSize() const { return indices_size; }
-        GLfloat* GetVertices() { return _sphere_vertices; }
-        GLfloat* GetNormals() { return _sphere_normals; }
-        GLfloat* GetTexcoords() { return _sphere_texcoords; }
-        GLuint* GetIndices() { return _sphere_indices; }
-		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
+        GLfloat* GetVertices() { return vertices_; }
+        GLfloat* GetNormals() { return normals_; }
+        GLfloat* GetTexcoords() { return texcoords_; }
+        GLuint* GetIndices() { return indices_; }
         void SetColor(glm::vec4 color);
-        glm::vec4 GetColor() const { return _color; }
-        void Init(GLuint *vbo, GLfloat* vertices, GLuint *ibo, GLuint* indices);
+        void BindBuffers(GLuint *vbo, GLuint *ibo);
 
 	private:
 		// Variablen 
-		//GLfloat* _vertices;
-		//GLfloat* _normals;
-		//GLfloat* _texcoords;
-		//GLuint* _indices;
 		float _radius;
         glm::vec4 _color;
 		const int rings = 16;
 		const int sectors = 16;
 
-        GLfloat _sphere_vertices[VERTICES_COUNT_OF_SPHERE];
-        GLfloat _sphere_normals[VERTICES_COUNT_OF_SPHERE];
-        GLfloat _sphere_texcoords[VERTICES_COUNT_OF_SPHERE];
-        GLuint _sphere_indices[INDICE_COUNT_OF_SPHERE];
+        GLfloat vertices_[VERTICES_COUNT_OF_SPHERE];
+        GLfloat normals_[VERTICES_COUNT_OF_SPHERE];
+        GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE];
+        GLuint indices_[INDICE_COUNT_OF_SPHERE];
 
-        int vertices_size = sizeof(_sphere_vertices);
-        int normals_size = sizeof(_sphere_normals);
-        int texcoords_size = sizeof(_sphere_texcoords);
-        int indices_size = sizeof(_sphere_indices);
+        int vertices_size = sizeof(vertices_);
+        int normals_size = sizeof(normals_);
+        int texcoords_size = sizeof(texcoords_);
+        int indices_size = sizeof(indices_);
+
+        //GLuint vbo_sphere_vertices;
+        //GLuint ibo_sphere_elements;
+		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
 
 		inline void push_indices(GLuint* indices, int index, int sectors, int r, int s);
 };

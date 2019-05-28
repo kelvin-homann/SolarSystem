@@ -4,7 +4,7 @@
 Sphere::Sphere(float radius) {
 	float _radius = radius;
 
-	CreateSphere(_sphere_vertices, _sphere_normals, _sphere_texcoords, _sphere_indices, _radius);
+	CreateSphere(vertices_, normals_, texcoords_, indices_, _radius);
 }
 
 void Sphere::CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
@@ -62,13 +62,18 @@ void Sphere::SetColor(glm::vec4 color)
     _color = color;
 }
 
-void Sphere::Init(GLuint *vbo, GLfloat* vertices, GLuint *ibo, GLuint* indices)
+//Sphere::~Sphere(void) {
+//    glDeleteBuffers(1, &vbo_sphere_vertices);
+//    glDeleteBuffers(1, &ibo_sphere_elements);
+//}
+
+void Sphere::BindBuffers(GLuint *vbo,GLuint *ibo)
 {
     glGenBuffers(1, vbo);
     glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);
 
     glGenBuffers(1, ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_, GL_STATIC_DRAW);
 }

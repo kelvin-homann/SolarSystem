@@ -27,19 +27,14 @@
 int screen_width = 1280, screen_height = 720;
 float cam_distance = 4.0f;
 
-ImVec4 bg_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
+ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
 // Earth Data
-//GLuint shader_program; // Shader Program
 GLint attribute_position, attribute_normals;
 GLint uniform_mvp;
 GLuint vbo_sphere_vertices;
 GLuint ibo_sphere_elements;
 glm::vec4 earth_color(0.0f, 1.0f, 0.0f, 0.5f);
-//GLfloat sphere_vertices[VERTICES_COUNT_OF_SPHERE];
-//GLfloat sphere_normals[VERTICES_COUNT_OF_SPHERE];
-//GLfloat sphere_texcoords[VERTICES_COUNT_OF_SPHERE];
-//GLuint sphere_indices[INDICE_COUNT_OF_SPHERE];
 Sphere earth(1.0f);
 
 float rot_speed = 1.0f;
@@ -51,14 +46,7 @@ Shader earth_shader = Shader();
 int InitResources()
 {
     earth.SetColor(earth_color);
-
-    glGenBuffers(1, &vbo_sphere_vertices);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
-    glBufferData(GL_ARRAY_BUFFER, earth.GetVerticesSize(), earth.GetVertices(), GL_STATIC_DRAW);
-
-    glGenBuffers(1, &ibo_sphere_elements);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_sphere_elements);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, earth.GetIndicesSize(), earth.GetIndices(), GL_STATIC_DRAW);
+    earth.BindBuffers(&vbo_sphere_vertices, &ibo_sphere_elements);
 
     earth_shader = Shader("sphere.v.glsl", "sphere.f.glsl");
 
@@ -66,14 +54,12 @@ int InitResources()
     attribute_normals = glGetAttribLocation(earth_shader.GetShader(), "v_color");
     uniform_mvp = glGetUniformLocation(earth_shader.GetShader(), "mvp");
 
-
-
     return 1;
 }
 
 void Render()
 {
-    glClearColor(bg_color.x, bg_color.y, bg_color.z, bg_color.w);
+    glClearColor(background_color.x, background_color.y, background_color.z, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     earth.SetColor(earth_color);
 
