@@ -62,18 +62,23 @@ void Sphere::SetColor(glm::vec4 color)
     _color = color;
 }
 
-//Sphere::~Sphere(void) {
-//    glDeleteBuffers(1, &vbo_sphere_vertices);
-//    glDeleteBuffers(1, &ibo_sphere_elements);
-//}
-
-void Sphere::BindBuffers(GLuint *vbo,GLuint *ibo)
+void Sphere::Render()
 {
-    glGenBuffers(1, vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+    
+}
+
+Sphere::~Sphere(void) {
+    glDeleteBuffers(1, &_vbo);
+    glDeleteBuffers(1, &_ibo);
+}
+
+void Sphere::BindBuffers()
+{
+    glGenBuffers(1, &_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);
 
-    glGenBuffers(1, ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ibo);
+    glGenBuffers(1, &_ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_, GL_STATIC_DRAW);
 }

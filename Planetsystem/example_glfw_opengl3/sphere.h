@@ -15,19 +15,28 @@
 class Sphere : public Model {
 	public:
 		Sphere(float radius);  // constructor
-		//~Sphere(); // destructor
+		~Sphere();
+
 		float GetRadius() const { return _radius; }
         glm::vec4 GetColor() const { return _color; }
+
 		int GetVerticesSize() const { return vertices_size; }
 		int GetNormalsSize() const { return normals_size; }
 		int GetTexcoordsSize() const { return texcoords_size; }
 		int GetIndicesSize() const { return indices_size; }
+
         GLfloat* GetVertices() { return vertices_; }
         GLfloat* GetNormals() { return normals_; }
         GLfloat* GetTexcoords() { return texcoords_; }
         GLuint* GetIndices() { return indices_; }
+
+        int GetVBO() const { return _vbo; }
+        int GetIBO() const { return _ibo; }
+
         void SetColor(glm::vec4 color);
-        void BindBuffers(GLuint *vbo, GLuint *ibo);
+        void BindBuffers();
+
+        void Render();
 
 	private:
 		// Variablen 
@@ -46,8 +55,9 @@ class Sphere : public Model {
         int texcoords_size = sizeof(texcoords_);
         int indices_size = sizeof(indices_);
 
-        //GLuint vbo_sphere_vertices;
-        //GLuint ibo_sphere_elements;
+        GLuint _vbo;
+        GLuint _ibo;
+
 		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
 
 		inline void push_indices(GLuint* indices, int index, int sectors, int r, int s);

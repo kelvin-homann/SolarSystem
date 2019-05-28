@@ -32,8 +32,7 @@ ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 // Earth Data
 GLint attribute_position, attribute_normals;
 GLint uniform_mvp;
-GLuint vbo_sphere_vertices;
-GLuint ibo_sphere_elements;
+
 glm::vec4 earth_color(0.0f, 1.0f, 0.0f, 0.5f);
 Sphere earth(1.0f);
 
@@ -46,7 +45,7 @@ Shader earth_shader = Shader();
 int InitResources()
 {
     earth.SetColor(earth_color);
-    earth.BindBuffers(&vbo_sphere_vertices, &ibo_sphere_elements);
+    earth.BindBuffers();
 
     earth_shader = Shader("sphere.v.glsl", "sphere.f.glsl");
 
@@ -68,7 +67,7 @@ void Render()
     
     glEnableVertexAttribArray(attribute_position);
     // Describe our vertices array to OpenGL (it can't guess its format automatically)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, earth.GetVBO());
     glVertexAttribPointer(
         attribute_position, // attribute
         3,                 // number of elements per vertex, here (x,y,z)
@@ -89,7 +88,7 @@ void Render()
     );
 
     /* Push each element in buffer_vertices to the vertex shader */
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_sphere_elements);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, earth.GetIBO());
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
@@ -144,8 +143,6 @@ void FreeResources(GLFWwindow * window)
     glfwDestroyWindow(window);
     glfwTerminate();
     glDeleteProgram(earth_shader.GetShader());
-    glDeleteBuffers(1, &vbo_sphere_vertices);
-    glDeleteBuffers(1, &ibo_sphere_elements);
 }
 
 static void glfw_error_callback(int error, const char* description)
