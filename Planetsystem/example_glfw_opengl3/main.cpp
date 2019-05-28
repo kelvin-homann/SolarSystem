@@ -36,11 +36,11 @@ GLint uniform_mvp;
 GLuint vbo_sphere_vertices;
 GLuint ibo_sphere_elements;
 glm::vec4 earth_color(0.0f, 1.0f, 0.0f, 0.5f);
-GLfloat sphere_vertices[VERTICES_COUNT_OF_SPHERE];
-GLfloat sphere_normals[VERTICES_COUNT_OF_SPHERE];
-GLfloat sphere_texcoords[VERTICES_COUNT_OF_SPHERE];
-GLuint sphere_indices[INDICE_COUNT_OF_SPHERE];
-Sphere earth(sphere_vertices, sphere_normals, sphere_texcoords, sphere_indices, 1.0f);
+//GLfloat sphere_vertices[VERTICES_COUNT_OF_SPHERE];
+//GLfloat sphere_normals[VERTICES_COUNT_OF_SPHERE];
+//GLfloat sphere_texcoords[VERTICES_COUNT_OF_SPHERE];
+//GLuint sphere_indices[INDICE_COUNT_OF_SPHERE];
+Sphere earth(1.0f);
 
 float rot_speed = 1.0f;
 
@@ -54,11 +54,11 @@ int InitResources()
 
     glGenBuffers(1, &vbo_sphere_vertices);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_sphere_vertices);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(sphere_vertices), sphere_vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, earth.GetVerticesSize(), earth.GetVertices(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &ibo_sphere_elements);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_sphere_elements);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(sphere_indices), sphere_indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, earth.GetIndicesSize(), earth.GetIndices(), GL_STATIC_DRAW);
 
     earth_shader = Shader("sphere.v.glsl", "sphere.f.glsl");
 
@@ -135,7 +135,7 @@ void InitImGui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Settings"); // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Settings");
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
 

@@ -1,14 +1,10 @@
 #include "sphere.h"
 
 // Constructor
-Sphere::Sphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius) {
-	GLfloat* _vertices = vertices;
-	GLfloat* _normals = normals;
-	GLfloat* _texcoords = texcoords;
-	GLuint* _indices = indices;
+Sphere::Sphere(float radius) {
 	float _radius = radius;
 
-	CreateSphere(_vertices, _normals, _texcoords, _indices, _radius);
+	CreateSphere(_sphere_vertices, _sphere_normals, _sphere_texcoords, _sphere_indices, _radius);
 }
 
 void Sphere::CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
