@@ -5,20 +5,19 @@
 
 #include <GL/gl3w.h>
 
-// Include glfw3.h after our OpenGL definitions
 #include <GLFW/glfw3.h>
 
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL // Debug
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "glm/ext.hpp" // Debug
 #include "shader.h"
 #include "sphere.h"
 #include <iostream>
 
-// [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
-// To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
-// Your own project should not be affected, as you are likely to link with a newer binary of GLFW that is adequate for your version of Visual Studio.
+// Legacy glf3.lib support
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
@@ -38,7 +37,17 @@ Sphere earth(1.0f);
 
 float rot_speed = 1.0f;
 
-//glm::vec3 position = glm::vec3(0.0, 0.0, -4.0f);
+// camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+bool firstMouse = true;
+float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch = 0.0f;
+float lastX = 800.0f / 2.0;
+float lastY = 600.0 / 2.0;
+float fov = 45.0f;
 
 float elapsed_time;
 
@@ -61,9 +70,12 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     earth.SetColor(earth_color);
 
+
     earth.Render(screen_height, screen_width);
 
-    //earth.SetModelViewProjection(screen_height, screen_width);
+    //glm::mat4 mvp = earth.GetMVP(screen_height, screen_width, rot_speed);
+
+    //earth.GetMVP(screen_height, screen_width, rot_speed);
 
     float angle = (ImGui::GetTime() / rot_speed) * 50;
     glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
@@ -74,6 +86,8 @@ void Render()
     glm::mat4 mvp = projection * view * model * anim;
 
     glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
+
+    //std::cout << glm::to_string(translatedmvp) << std::endl;
 
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
@@ -98,7 +112,7 @@ void InitImGui()
     ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
     ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);
 
-    ImGui::ShowDemoWindow(&show_demo_window);
+    //ImGui::ShowDemoWindow(&show_demo_window);
 
     ImGui::ColorEdit4("Color", (float*)& earth_color); 
 

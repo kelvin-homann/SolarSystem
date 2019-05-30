@@ -84,6 +84,9 @@
     <ClInclude Include="model.h">
       <Filter>sources\header</Filter>
     </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>sources\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

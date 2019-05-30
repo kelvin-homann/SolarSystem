@@ -11,7 +11,7 @@
 
 class Model {
 public:
-    void SetModelViewProjection(int screen_height, int screen_width);
+    glm::mat4 GetMVP(int screen_height, int screen_width, float rot_speed);
     void SetShader(const char* vertexPath, const char* fragmentPath);
     glm::mat4 GetMVP() const { return _mvp; }
     float getCamDist() const { return cam_distance; }
