@@ -15,6 +15,7 @@
 #include "glm/ext.hpp" // Debug
 #include "shader.h"
 #include "sphere.h"
+#include "camera.h"
 #include <iostream>
 
 // Legacy glf3.lib support
@@ -38,16 +39,12 @@ Sphere earth(1.0f);
 float rot_speed = 1.0f;
 
 // camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+Camera camera(camera_pos);
 
-bool firstMouse = true;
-float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch = 0.0f;
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
-float fov = 45.0f;
+// Menu
+bool show_demo_window = true;
+bool show_earth = false;
 
 float elapsed_time;
 
@@ -70,32 +67,25 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     earth.SetColor(earth_color);
 
-
     earth.Render(screen_height, screen_width);
 
-    //glm::mat4 mvp = earth.GetMVP(screen_height, screen_width, rot_speed);
-
-    //earth.GetMVP(screen_height, screen_width, rot_speed);
-
     float angle = (ImGui::GetTime() / rot_speed) * 50;
+
+    glm::mat4 view = camera.GetViewMatrix(); // Camera
+
     glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
     glm::mat4 model = glm::translate(glm::mat4(1.0f), earth.position);
-    glm::mat4 view = glm::lookAt(glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, -cam_distance), glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
 
     glm::mat4 mvp = projection * view * model * anim;
 
     glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
 
-    //std::cout << glm::to_string(translatedmvp) << std::endl;
-
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 
 void InitImGui()
 {
-    bool show_demo_window = true;
-
     const char* shading_elements[]{ "Flat", "Gouraud", "Phong" };
     int selectedItem = 0;
     // Start the Dear ImGui frame
@@ -103,19 +93,28 @@ void InitImGui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Settings");
+    ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
 
-    ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
+    ImGui::ShowDemoWindow(&show_demo_window); // Debug
 
-    ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
-    ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);
+    ImGui::Text("Camera");
+    ImGui::SliderFloat3("", glm::value_ptr(camera.position), -10.0f, 10.0f);
 
-    //ImGui::ShowDemoWindow(&show_demo_window);
+    ImGui::Checkbox("Earth", &show_earth);
 
-    ImGui::ColorEdit4("Color", (float*)& earth_color); 
+    if (show_earth)
+    {
+        ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", (float*)& earth_color);
+        ImGui::End();
+    }
 
+    
     ImGui::Text("Stats:");
     ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
     ImGui::End();
