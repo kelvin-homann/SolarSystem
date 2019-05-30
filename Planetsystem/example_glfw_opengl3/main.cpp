@@ -16,6 +16,7 @@
 #include "shader.h"
 #include "sphere.h"
 #include "camera.h"
+#include "soil.h"
 #include <iostream>
 
 // Legacy glf3.lib support
@@ -147,6 +148,12 @@ int main(int, char**)
     GLFWwindow* window = glfwCreateWindow(screen_width, screen_height, "Planets", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+
+    // Icon
+    GLFWimage icons[1];
+    icons[0].pixels = SOIL_load_image("icon.png", &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
+    glfwSetWindowIcon(window, 1, icons);
+    SOIL_free_image_data(icons[0].pixels);
 
     // Initialize OpenGL loader
     bool err = gl3wInit() != 0;
