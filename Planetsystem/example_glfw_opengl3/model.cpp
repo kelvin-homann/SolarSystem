@@ -12,3 +12,8 @@ void Model::SetModelViewProjection(int screen_height, int screen_width)
 
     //glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
 }
+
+void Model::SetShader(const char* vertexPath, const char* fragmentPath)
+{
+    shader = Shader(vertexPath, fragmentPath);
+}
