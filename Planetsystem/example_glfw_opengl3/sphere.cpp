@@ -75,7 +75,7 @@ void Sphere::Render(int screen_height, int screen_width)
     attribute_normals = glGetAttribLocation(GetShader().GetShaderProgram(), "v_color");
     uniform_mvp = glGetUniformLocation(GetShader().GetShaderProgram(), "mvp");
 
-    glUseProgram(GetShader().GetShaderProgram());
+    GetShader().Use(); // glUseProgram
     glUniform4f(glGetUniformLocation(GetShader().GetShaderProgram(), "ourColor"), GetColor().x, GetColor().y, GetColor().z, GetColor().w);
 
     glEnableVertexAttribArray(attribute_position);

@@ -24,13 +24,12 @@
 #endif
 
 // Global Variables
-int screen_width = 1280, screen_height = 720;
-float cam_distance = 4.0f;
+int screen_width = 1280;
+int screen_height = 720;
 
 ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
 // Earth Data
-GLint attribute_position, attribute_normals;
 GLint uniform_mvp;
 
 glm::vec4 earth_color(0.0f, 1.0f, 0.0f, 0.5f);
@@ -38,25 +37,18 @@ Sphere earth(1.0f);
 
 float rot_speed = 1.0f;
 
-// camera
-glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
-Camera camera(camera_pos);
+// Camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 // Menu
 bool show_demo_window = true;
 bool show_earth = false;
-
-float elapsed_time;
 
 int InitResources()
 {
     earth.SetShader("sphere.v.glsl", "sphere.f.glsl");
     earth.SetColor(earth_color);
     earth.BindBuffers();
-
-    attribute_position = glGetAttribLocation(earth.GetShader().GetShaderProgram(), "coord3d");
-    attribute_normals = glGetAttribLocation(earth.GetShader().GetShaderProgram(), "v_color");
-    uniform_mvp = glGetUniformLocation(earth.GetShader().GetShaderProgram(), "mvp");
 
     return 1;
 }
@@ -66,7 +58,6 @@ void Render()
     glClearColor(background_color.x, background_color.y, background_color.z, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     earth.SetColor(earth_color);
-
     earth.Render(screen_height, screen_width);
 
     float angle = (ImGui::GetTime() / rot_speed) * 50;
@@ -96,11 +87,13 @@ void InitImGui()
     ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
+    //ImGui::ShowDemoWindow(&show_demo_window); // Debug
 
-    ImGui::ShowDemoWindow(&show_demo_window); // Debug
-
+    ImGui::Separator();
     ImGui::Text("Camera");
     ImGui::SliderFloat3("", glm::value_ptr(camera.position), -10.0f, 10.0f);
+
+    ImGui::Separator();
 
     ImGui::Checkbox("Earth", &show_earth);
 
@@ -114,7 +107,7 @@ void InitImGui()
         ImGui::End();
     }
 
-    
+    ImGui::Separator();
     ImGui::Text("Stats:");
     ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
     ImGui::End();

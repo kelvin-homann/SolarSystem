@@ -224,3 +224,8 @@ GLint Shader::GetUniform(GLuint program, const char *name) {
 		fprintf(stderr, "Could not bind uniform %s\n", name);
 	return uniform;
 }
+
+
+void Shader::Use() {
+   glUseProgram(shader_program);
+}

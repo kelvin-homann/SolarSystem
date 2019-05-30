@@ -14,6 +14,7 @@ public:
     GLint GetVertex() const { return vertex_shader; }
     GLint GetFragment() const { return fragment_shader; }
     GLint GetShaderProgram() const { return shader_program; }
+    void Use();
 private:
     GLuint shader_program = 0;
     GLuint vertex_shader = 0;
