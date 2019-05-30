@@ -33,35 +33,39 @@ ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 GLint uniform_mvp;
 
 // Planets, Moons and the Sun
-
 // Sun
 glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
-Sphere sun(1.0f);
+Sphere sun(2.0f);
+float sun_rot_speed = 1.0f;
 
 // Moons
-glm::vec4 moon_color(0.0f, 1.0f, 0.5f, 1.0f);
-Sphere earth_moon(0.2f);
-Sphere mars_moon(0.2f);
-Sphere jupiter_moon(0.2f);
+glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
+Sphere earth_moon(0.1f);
+Sphere mars_moon(0.1f);
+Sphere jupiter_moon(0.1f);
 
 // Earth
-glm::vec4 earth_color(0.0f, 1.0f, 0.5f, 1.0f);
+glm::vec4 earth_color(0.0f, 0.5f, 1.0f, 1.0f);
 Sphere earth(0.5f);
+float earth_rot_speed = 1.0f;
 
 // Mars
-glm::vec4 mars_color(1.0f, 0.9f, 0.15f, 1.0f);
+glm::vec4 mars_color(1.0f, 0.5f, 0.0f, 1.0f);
 Sphere mars(0.7f);
+float mars_rot_speed = 1.0f;
 
 // Jupiter
-glm::vec4 jupiter_color(1.0f, 0.9f, 0.15f, 1.0f);
+glm::vec4 jupiter_color(1.0f, 0.3f, 0.15f, 1.0f);
 Sphere jupiter(1.0f);
+float jupiter_rot_speed = 1.0f;
 
-float rot_speed = 1.0f;
 
 bool wireframe_enabled = false;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+float near_plane = 0.1f;
+float far_plane = 10.0f;
 float lastX = screen_width / 2.0f;
 float lastY = screen_height / 2.0f;
 bool firstMouse = true;
@@ -75,12 +79,15 @@ bool show_demo_window = true;
 bool show_earth = false;
 bool show_sun = false;
 bool show_earth_moon = false;
+bool show_mars = false;
+bool show_mars_moon = false;
+bool show_jupiter = false;
+bool show_jupiter_moon = false;
 
 glm::mat4 anim = glm::mat4(1.0f);
 glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 projection = glm::mat4(1.0f);
 glm::mat4 mvp = glm::mat4(1.0f);
-glm::mat4 translatedmvp = glm::mat4(1.0f);
 
 int InitResources()
 {
@@ -122,29 +129,28 @@ int InitResources()
     return 1;
 }
 
-
-
 void Render()
 {
     float angle;
     glClearColor(background_color.x, background_color.y, background_color.z, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glm::mat4 view = camera.GetViewMatrix(); // Camera
-    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f); // Projection
-
+    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 50.0f); // Projection
+    angle = (ImGui::GetTime() / sun_rot_speed) * 50;
 
     // Sun
     sun.SetColor(sun_color);
     sun.Render(screen_height, screen_width);
 
-    angle = (ImGui::GetTime() / rot_speed) * 50;
-
     anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), sun.rotation);
     model = glm::translate(glm::mat4(1.0f), sun.position);
-    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
+
     mvp = projection * view * model * anim;
 
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    mvp = glm::mat4(1.0f);
+    angle = (ImGui::GetTime() / earth_rot_speed) * 50;
 
     // Earth
     earth.SetColor(earth_color);
@@ -155,23 +161,42 @@ void Render()
 
     mvp = projection * view * model * anim;
 
+    mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position);
+
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
-    //// Earth Moon
-    //earth_moon.SetColor(moon_color);
-    //earth_moon.Render(screen_height, screen_width);
+    //std::cout << glm::to_string(mvp) << std::endl;
 
-    //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth_moon.rotation);
-    //model = glm::translate(glm::mat4(1.0f), earth_moon.position);
-    //projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
-    //mvp = projection * view * model * anim;
+    mvp = glm::mat4(1.0f);
+    angle = (ImGui::GetTime() / mars_rot_speed) * 50;
+    // Mars
+    mars.SetColor(mars_color);
+    mars.Render(screen_height, screen_width);
 
-    //translatedmvp = glm::mat4(1);
+    anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), mars.rotation);
+    model = glm::translate(glm::mat4(1.0f), mars.position);
 
-    //translatedmvp = mvp * glm::translate(glm::mat4(1.0f), earth.position);
+    mvp = projection * view * model * anim;
 
-    //glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(translatedmvp));
+    mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position + glm::vec3(3, 0, 10));
 
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    mvp = glm::mat4(1.0f);
+    angle = (ImGui::GetTime() / jupiter_rot_speed) * 50;
+
+    // Jupiter
+    jupiter.SetColor(jupiter_color);
+    jupiter.Render(screen_height, screen_width);
+
+    anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), jupiter.rotation);
+    model = glm::translate(glm::mat4(1.0f), jupiter.position);
+
+    mvp = projection * view * model * anim;
+
+    mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position + glm::vec3(3, 0, 15));
+
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 
 void InitImGui()
@@ -185,9 +210,10 @@ void InitImGui()
 
     ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoCollapse);
 
+    //ImGui::ShowDemoWindow(&show_demo_window); // Debug
+
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
     ImGui::Checkbox("Wireframe", &wireframe_enabled);
-    //ImGui::ShowDemoWindow(&show_demo_window); // Debug
 
     ImGui::Separator();
     ImGui::Text("Camera");
@@ -196,13 +222,27 @@ void InitImGui()
 
     ImGui::Separator();
 
-    ImGui::Checkbox("Earth", &show_earth);
+    ImGui::Text("Planets");
+    ImGui::Checkbox("Sun", &show_sun); ImGui::SameLine(100);
+    ImGui::Checkbox("Earth", &show_earth); 
+    ImGui::Checkbox("Mars", &show_mars); ImGui::SameLine(100);
+    ImGui::Checkbox("Jupiter", &show_jupiter); 
+
+    if (show_sun)
+    {
+        ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Rotation Speed", &sun_rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(sun.position), -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(sun.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", (float*)& sun_color);
+        ImGui::End();
+    }
 
     if (show_earth)
     {
         ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
-        ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
+        ImGui::SliderFloat("Rotation Speed", &earth_rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -20.0f, 20.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
         ImGui::ColorEdit4("Color", (float*)& earth_color);
 
@@ -211,8 +251,8 @@ void InitImGui()
         if (show_earth_moon)
         {
             ImGui::Begin("Earth Moon Settings", &show_earth_moon, ImGuiWindowFlags_NoCollapse);
-            ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
-            ImGui::SliderFloat3("Position", glm::value_ptr(earth_moon.position), -10.0f, 10.0f);
+            ImGui::SliderFloat("Rotation Speed", &sun_rot_speed, 10.0f, 0.2f);
+            ImGui::SliderFloat3("Position", glm::value_ptr(earth_moon.position), -20.0f, 20.0f);
             ImGui::SliderFloat3("Rotation", glm::value_ptr(earth_moon.rotation), -1.0f, 1.0f);;
             ImGui::ColorEdit4("Color", (float*)& moon_color);
             ImGui::End();
@@ -221,15 +261,49 @@ void InitImGui()
         ImGui::End();
     }
 
-    ImGui::Checkbox("Sun", &show_sun);
-
-    if (show_sun)
+    if (show_mars)
     {
-        ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
-        ImGui::SliderFloat3("Position", glm::value_ptr(sun.position), -10.0f, 10.0f);
-        ImGui::SliderFloat3("Rotation", glm::value_ptr(sun.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", (float*)& sun_color);
+        ImGui::Begin("Mars Settings", &show_mars, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Rotation Speed", &mars_rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(mars.position), -20.0f, 20.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(mars.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", (float*)& mars_color);
+
+        ImGui::Checkbox("Moon", &show_mars_moon);
+
+        if (show_mars_moon)
+        {
+            ImGui::Begin("Mars Moon Settings", &show_mars_moon, ImGuiWindowFlags_NoCollapse);
+            ImGui::SliderFloat("Rotation Speed", &sun_rot_speed, 10.0f, 0.2f);
+            ImGui::SliderFloat3("Position", glm::value_ptr(mars_moon.position), -20.0f, 20.0f);
+            ImGui::SliderFloat3("Rotation", glm::value_ptr(mars_moon.rotation), -1.0f, 1.0f);;
+            ImGui::ColorEdit4("Color", (float*)& moon_color);
+            ImGui::End();
+        }
+
+        ImGui::End();
+    }
+
+    if (show_jupiter)
+    {
+        ImGui::Begin("Jupiter Settings", &show_jupiter, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Rotation Speed", &jupiter_rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(jupiter.position), -20.0f, 20.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(jupiter.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", (float*)& jupiter_color);
+
+        ImGui::Checkbox("Moon", &show_jupiter_moon);
+
+        if (show_jupiter_moon)
+        {
+            ImGui::Begin("Jupiter Moon Settings", &show_jupiter_moon, ImGuiWindowFlags_NoCollapse);
+            ImGui::SliderFloat("Rotation Speed", &sun_rot_speed, 10.0f, 0.2f);
+            ImGui::SliderFloat3("Position", glm::value_ptr(jupiter_moon.position), -20.0f, 20.0f);
+            ImGui::SliderFloat3("Rotation", glm::value_ptr(jupiter_moon.rotation), -1.0f, 1.0f);;
+            ImGui::ColorEdit4("Color", (float*)& moon_color);
+            ImGui::End();
+        }
+
         ImGui::End();
     }
 
@@ -263,7 +337,6 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -283,6 +356,7 @@ void framebuffer_size_callback(GLFWwindow * window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+
 int main(int, char**)
 {
     // Setup window
@@ -300,6 +374,7 @@ int main(int, char**)
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
+    glfwWindowHint(GLFW_SAMPLES, 4); // Anti-Aliasing
 
     // Icon
     GLFWimage icons[1];
@@ -353,6 +428,7 @@ int main(int, char**)
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_MULTISAMPLE); // Anti-Aliasing
 
         glfwSwapBuffers(window);
         glfwPollEvents();

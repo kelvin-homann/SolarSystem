@@ -11,16 +11,13 @@
 
 class Model {
 public:
-    glm::mat4 GetMVP(int screen_height, int screen_width, float rot_speed);
     void SetShader(const char* vertexPath, const char* fragmentPath);
     glm::mat4 GetMVP() const { return _mvp; }
-    float getCamDist() const { return cam_distance; }
     Shader GetShader() const { return shader; }
 
     glm::vec3 position = glm::vec3(0.0, 0.0, -4.0f);
     glm::vec3 rotation = glm::vec3(0, 1, 0);
 private:
-    float cam_distance = -4.0f;
     glm::mat4 _model = glm::mat4(1);
     glm::mat4 _view = glm::mat4(1);
     glm::mat4 _projection = glm::mat4(1);
