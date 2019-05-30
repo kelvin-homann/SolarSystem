@@ -3,8 +3,12 @@
 // Constructor
 Sphere::Sphere(float radius) {
 	float _radius = radius;
-
 	CreateSphere(vertices_, normals_, texcoords_, indices_, _radius);
+}
+
+Sphere::~Sphere(void) {
+    glDeleteBuffers(1, &_vbo);
+    glDeleteBuffers(1, &_ibo);
 }
 
 void Sphere::CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
@@ -62,15 +66,50 @@ void Sphere::SetColor(glm::vec4 color)
     _color = color;
 }
 
-void Sphere::Render()
+void Sphere::Render(int screen_height, int screen_width)
 {
-    
+    GLint attribute_position, attribute_normals;
+    GLint uniform_mvp;
+
+    attribute_position = glGetAttribLocation(GetShader().GetShaderProgram(), "coord3d");
+    attribute_normals = glGetAttribLocation(GetShader().GetShaderProgram(), "v_color");
+    uniform_mvp = glGetUniformLocation(GetShader().GetShaderProgram(), "mvp");
+
+    glUseProgram(GetShader().GetShaderProgram());
+    glUniform4f(glGetUniformLocation(GetShader().GetShaderProgram(), "ourColor"), GetColor().x, GetColor().y, GetColor().z, GetColor().w);
+
+    glEnableVertexAttribArray(attribute_position);
+    // Describe our vertices array to OpenGL (it can't guess its format automatically)
+    glBindBuffer(GL_ARRAY_BUFFER, GetVBO());
+    glVertexAttribPointer(
+        attribute_position, // attribute
+        3,                 // number of elements per vertex, here (x,y,z)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+
+    glEnableVertexAttribArray(attribute_normals);
+    glVertexAttribPointer(
+        attribute_normals, // attribute
+        3,                 // number of elements per vertex, here (R,G,B)
+        GL_FLOAT,          // the type of each element
+        GL_FALSE,          // take our values as-is
+        0,                 // no extra data between each position
+        0                  // offset of first element
+    );
+
+    /* Push each element in buffer_vertices to the vertex shader */
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,GetIBO());
+    int size;
+    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+    glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+    glDisableVertexAttribArray(attribute_position);
+    glDisableVertexAttribArray(attribute_normals);
 }
 
-Sphere::~Sphere(void) {
-    glDeleteBuffers(1, &_vbo);
-    glDeleteBuffers(1, &_ibo);
-}
 
 void Sphere::BindBuffers()
 {

@@ -14,14 +14,16 @@ public:
     void SetModelViewProjection(int screen_height, int screen_width);
     void SetShader(const char* vertexPath, const char* fragmentPath);
     glm::mat4 GetMVP() const { return _mvp; }
+    float getCamDist() const { return cam_distance; }
+    Shader GetShader() const { return shader; }
 private:
     float cam_distance = -4.0f;
-    glm::mat4 _model;
-    glm::mat4 _view;
-    glm::mat4 _projection;
-    glm::mat4 _mvp;
+    glm::mat4 _model = glm::mat4(1);
+    glm::mat4 _view = glm::mat4(1);
+    glm::mat4 _projection = glm::mat4(1);
+    glm::mat4 _mvp = glm::mat4(1);
 
-    Shader shader;
+    Shader shader = Shader();
 };
 
 #endif

@@ -1,15 +1,10 @@
-/**
- * From the OpenGL Programming wikibook: http://en.wikibooks.org/wiki/OpenGL_Programming
- * This file is in the public domain.
- * Contributors: Sylvain Beucler
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <GL/gl3w.h>
 #include "shader.h"
 #include <iostream>
 
+// Default Constructor
 Shader::Shader() {};
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {    
@@ -31,10 +26,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 }
 
 
-/**
- * Store all the file's contents in memory, useful to pass shaders
- * source code to OpenGL
- */
+// Storing all the file's contents in memory, useful to pass shaders
 char* Shader::FileRead(const char* filename)
 {
   FILE* in = fopen(filename, "rb");
@@ -60,9 +52,7 @@ char* Shader::FileRead(const char* filename)
   return res;
 }
 
-/**
- * Display compilation errors from the OpenGL shader compiler
- */
+// Display compilation errors from the OpenGL shader compiler
 void Shader::PrintLog(GLuint object)
 {
   GLint log_length = 0;
@@ -86,9 +76,8 @@ void Shader::PrintLog(GLuint object)
   free(log);
 }
 
-/**
- * Compile the shader from file 'filename', with error handling
- */
+// Compile the shader from file 'filename', with error handling
+
 GLuint Shader::CreateShader(const char* filename, GLenum type)
 {
   const GLchar* source = FileRead(filename);

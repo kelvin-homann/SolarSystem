@@ -1,8 +1,3 @@
-/**
- * From the OpenGL Programming wikibook: http://en.wikibooks.org/wiki/OpenGL_Programming
- * This file is in the public domain.
- * Contributors: Sylvain Beucler
- */
 #ifndef _CREATE_SHADER_H
 #define _CREATE_SHADER_H
 #include <GL/gl3w.h> 
@@ -18,10 +13,11 @@ public:
     GLint GetUniform(GLuint program, const char* name);
     GLint GetVertex() const { return vertex_shader; }
     GLint GetFragment() const { return fragment_shader; }
-    GLint GetShader() const { return shader_program; }
+    GLint GetShaderProgram() const { return shader_program; }
 private:
-    GLuint shader_program; // Shader Program
-    GLuint vertex_shader, fragment_shader;
+    GLuint shader_program = 0;
+    GLuint vertex_shader = 0;
+    GLuint fragment_shader = 0;
     GLuint CreateProgram(const char* vertexfile, const char* fragmentfile);
     GLuint CreateShader(const char* filename, GLenum type);
     char* FileRead(const char* filename);

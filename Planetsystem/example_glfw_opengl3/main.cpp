@@ -40,18 +40,15 @@ float rot_speed = 1.0f;
 
 float elapsed_time;
 
-Shader earth_shader = Shader();
-
 int InitResources()
 {
+    earth.SetShader("sphere.v.glsl", "sphere.f.glsl");
     earth.SetColor(earth_color);
     earth.BindBuffers();
 
-    earth_shader = Shader("sphere.v.glsl", "sphere.f.glsl");
-
-    attribute_position = glGetAttribLocation(earth_shader.GetShader(), "coord3d");
-    attribute_normals = glGetAttribLocation(earth_shader.GetShader(), "v_color");
-    uniform_mvp = glGetUniformLocation(earth_shader.GetShader(), "mvp");
+    attribute_position = glGetAttribLocation(earth.GetShader().GetShaderProgram(), "coord3d");
+    attribute_normals = glGetAttribLocation(earth.GetShader().GetShaderProgram(), "v_color");
+    uniform_mvp = glGetUniformLocation(earth.GetShader().GetShaderProgram(), "mvp");
 
     return 1;
 }
@@ -62,39 +59,7 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     earth.SetColor(earth_color);
 
-    glUseProgram(earth_shader.GetShader());
-    glUniform4f(glGetUniformLocation(earth_shader.GetShader(), "ourColor"), earth.GetColor().x, earth.GetColor().y, earth.GetColor().z, earth.GetColor().w);
-    
-    glEnableVertexAttribArray(attribute_position);
-    // Describe our vertices array to OpenGL (it can't guess its format automatically)
-    glBindBuffer(GL_ARRAY_BUFFER, earth.GetVBO());
-    glVertexAttribPointer(
-        attribute_position, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
-
-    glEnableVertexAttribArray(attribute_normals);
-    glVertexAttribPointer(
-        attribute_normals, // attribute
-        3,                 // number of elements per vertex, here (R,G,B)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
-
-    /* Push each element in buffer_vertices to the vertex shader */
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, earth.GetIBO());
-    int size;
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
-    glDisableVertexAttribArray(attribute_position);
-    glDisableVertexAttribArray(attribute_normals);
+    earth.Render(screen_height, screen_width);
 
     //earth.SetModelViewProjection(screen_height, screen_width);
 
@@ -142,7 +107,7 @@ void FreeResources(GLFWwindow * window)
     ImGui::DestroyContext();
     glfwDestroyWindow(window);
     glfwTerminate();
-    glDeleteProgram(earth_shader.GetShader());
+    glDeleteProgram(earth.GetShader().GetShaderProgram());
 }
 
 static void glfw_error_callback(int error, const char* description)

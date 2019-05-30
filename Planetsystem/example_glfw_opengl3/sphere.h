@@ -36,12 +36,12 @@ class Sphere : public Model {
         void SetColor(glm::vec4 color);
         void BindBuffers();
 
-        void Render();
+        void Render(int screen_height, int screen_width);
 
 	private:
 		// Variablen 
-		float _radius;
-        glm::vec4 _color;
+		float _radius = 0.0f;
+        glm::vec4 _color = glm::vec4(1);
 		const int rings = 16;
 		const int sectors = 16;
 
@@ -55,8 +55,8 @@ class Sphere : public Model {
         int texcoords_size = sizeof(texcoords_);
         int indices_size = sizeof(indices_);
 
-        GLuint _vbo;
-        GLuint _ibo;
+        GLuint _vbo = 0;
+        GLuint _ibo = 0;
 
 		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
 
