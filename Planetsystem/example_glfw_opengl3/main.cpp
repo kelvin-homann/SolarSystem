@@ -30,50 +30,148 @@ int screen_height = 720;
 
 ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-// Earth Data
 GLint uniform_mvp;
 
-glm::vec4 earth_color(0.0f, 1.0f, 0.0f, 0.5f);
-Sphere earth(1.0f);
+// Planets, Moons and the Sun
+
+// Sun
+glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
+Sphere sun(1.0f);
+
+// Moons
+glm::vec4 moon_color(0.0f, 1.0f, 0.5f, 1.0f);
+Sphere earth_moon(0.2f);
+Sphere mars_moon(0.2f);
+Sphere jupiter_moon(0.2f);
+
+// Earth
+glm::vec4 earth_color(0.0f, 1.0f, 0.5f, 1.0f);
+Sphere earth(0.5f);
+
+// Mars
+glm::vec4 mars_color(1.0f, 0.9f, 0.15f, 1.0f);
+Sphere mars(0.7f);
+
+// Jupiter
+glm::vec4 jupiter_color(1.0f, 0.9f, 0.15f, 1.0f);
+Sphere jupiter(1.0f);
 
 float rot_speed = 1.0f;
 
+bool wireframe_enabled = false;
+
 // Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+float lastX = screen_width / 2.0f;
+float lastY = screen_height / 2.0f;
+bool firstMouse = true;
+
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
 
 // Menu
 bool show_demo_window = true;
 bool show_earth = false;
+bool show_sun = false;
+bool show_earth_moon = false;
+
+glm::mat4 anim = glm::mat4(1.0f);
+glm::mat4 model = glm::mat4(1.0f);
+glm::mat4 projection = glm::mat4(1.0f);
+glm::mat4 mvp = glm::mat4(1.0f);
+glm::mat4 translatedmvp = glm::mat4(1.0f);
 
 int InitResources()
 {
+    // Sun
+    sun.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    sun.SetColor(sun_color);
+    sun.BindBuffers();
+
+    // Earth
     earth.SetShader("sphere.v.glsl", "sphere.f.glsl");
     earth.SetColor(earth_color);
     earth.BindBuffers();
 
+    // Earth Moob
+    earth_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    earth_moon.SetColor(moon_color);
+    earth_moon.BindBuffers();
+
+    // Mars
+    mars.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    mars.SetColor(mars_color);
+    mars.BindBuffers();
+
+    // Mars Moon
+    mars_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    mars_moon.SetColor(moon_color);
+    mars_moon.BindBuffers();
+
+    // Jupiter
+    jupiter.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    jupiter.SetColor(jupiter_color);
+    jupiter.BindBuffers();
+
+    // Jupiter Moon
+    jupiter_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    jupiter_moon.SetColor(moon_color);
+    jupiter_moon.BindBuffers();
+
     return 1;
 }
 
+
+
 void Render()
 {
+    float angle;
     glClearColor(background_color.x, background_color.y, background_color.z, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glm::mat4 view = camera.GetViewMatrix(); // Camera
+    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f); // Projection
+
+
+    // Sun
+    sun.SetColor(sun_color);
+    sun.Render(screen_height, screen_width);
+
+    angle = (ImGui::GetTime() / rot_speed) * 50;
+
+    anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), sun.rotation);
+    model = glm::translate(glm::mat4(1.0f), sun.position);
+    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
+    mvp = projection * view * model * anim;
+
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    // Earth
     earth.SetColor(earth_color);
     earth.Render(screen_height, screen_width);
 
-    float angle = (ImGui::GetTime() / rot_speed) * 50;
+    anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
+    model = glm::translate(glm::mat4(1.0f), earth.position);
 
-    glm::mat4 view = camera.GetViewMatrix(); // Camera
-
-    glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), earth.position);
-    glm::mat4 projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
-
-    glm::mat4 mvp = projection * view * model * anim;
-
-    glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
+    mvp = projection * view * model * anim;
 
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    //// Earth Moon
+    //earth_moon.SetColor(moon_color);
+    //earth_moon.Render(screen_height, screen_width);
+
+    //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth_moon.rotation);
+    //model = glm::translate(glm::mat4(1.0f), earth_moon.position);
+    //projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
+    //mvp = projection * view * model * anim;
+
+    //translatedmvp = glm::mat4(1);
+
+    //translatedmvp = mvp * glm::translate(glm::mat4(1.0f), earth.position);
+
+    //glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(translatedmvp));
+
 }
 
 void InitImGui()
@@ -85,14 +183,16 @@ void InitImGui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoCollapse);
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
+    ImGui::Checkbox("Wireframe", &wireframe_enabled);
     //ImGui::ShowDemoWindow(&show_demo_window); // Debug
 
     ImGui::Separator();
     ImGui::Text("Camera");
-    ImGui::SliderFloat3("", glm::value_ptr(camera.position), -10.0f, 10.0f);
+    ImGui::Text("Position");
+    ImGui::SliderFloat3("", glm::value_ptr(camera.position), -20.0f, 20.0f);
 
     ImGui::Separator();
 
@@ -100,11 +200,36 @@ void InitImGui()
 
     if (show_earth)
     {
-        ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
         ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
         ImGui::ColorEdit4("Color", (float*)& earth_color);
+
+        ImGui::Checkbox("Moon", &show_earth_moon);
+
+        if (show_earth_moon)
+        {
+            ImGui::Begin("Earth Moon Settings", &show_earth_moon, ImGuiWindowFlags_NoCollapse);
+            ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
+            ImGui::SliderFloat3("Position", glm::value_ptr(earth_moon.position), -10.0f, 10.0f);
+            ImGui::SliderFloat3("Rotation", glm::value_ptr(earth_moon.rotation), -1.0f, 1.0f);;
+            ImGui::ColorEdit4("Color", (float*)& moon_color);
+            ImGui::End();
+        }
+
+        ImGui::End();
+    }
+
+    ImGui::Checkbox("Sun", &show_sun);
+
+    if (show_sun)
+    {
+        ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
+        ImGui::SliderFloat3("Position", glm::value_ptr(sun.position), -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(sun.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", (float*)& sun_color);
         ImGui::End();
     }
 
@@ -132,6 +257,32 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow * window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
 int main(int, char**)
 {
     // Setup window
@@ -146,6 +297,7 @@ int main(int, char**)
 
     // Initialisation of window
     GLFWwindow* window = glfwCreateWindow(screen_width, screen_height, "Planets", NULL, NULL);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -179,12 +331,23 @@ int main(int, char**)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        processInput(window);
+
         InitImGui();
         Render();
         glfwMakeContextCurrent(window);
         glfwGetFramebufferSize(window, &screen_width, &screen_height);
         glViewport(0, 0, screen_width, screen_height);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // Wireframe Mode
+        if (wireframe_enabled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
 
         glEnable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);

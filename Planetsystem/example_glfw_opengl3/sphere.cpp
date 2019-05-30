@@ -69,11 +69,9 @@ void Sphere::SetColor(glm::vec4 color)
 void Sphere::Render(int screen_height, int screen_width)
 {
     GLint attribute_position, attribute_normals;
-    GLint uniform_mvp;
 
     attribute_position = glGetAttribLocation(GetShader().GetShaderProgram(), "coord3d");
     attribute_normals = glGetAttribLocation(GetShader().GetShaderProgram(), "v_color");
-    uniform_mvp = glGetUniformLocation(GetShader().GetShaderProgram(), "mvp");
 
     GetShader().Use(); // glUseProgram
     glUniform4f(glGetUniformLocation(GetShader().GetShaderProgram(), "ourColor"), GetColor().x, GetColor().y, GetColor().z, GetColor().w);
