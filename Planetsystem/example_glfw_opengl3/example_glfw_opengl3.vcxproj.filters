@@ -90,9 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="sphere_phong.v.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
     <None Include="sphere.f.glsl">
       <Filter>sources\shader</Filter>
     </None>
@@ -101,6 +98,12 @@
     </None>
     <None Include="..\..\misc\natvis\imgui.natvis">
       <Filter>imgui</Filter>
+    </None>
+    <None Include="lighting.v.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
+    <None Include="lighting.f.glsl">
+      <Filter>sources\shader</Filter>
     </None>
   </ItemGroup>
 </Project>
