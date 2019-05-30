@@ -38,6 +38,8 @@ Sphere earth(1.0f);
 
 float rot_speed = 1.0f;
 
+//glm::vec3 position = glm::vec3(0.0, 0.0, -4.0f);
+
 float elapsed_time;
 
 int InitResources()
@@ -64,8 +66,8 @@ void Render()
     //earth.SetModelViewProjection(screen_height, screen_width);
 
     float angle = (ImGui::GetTime() / rot_speed) * 50;
-    glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0, 1, 0));
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -4.0f));
+    glm::mat4 anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), earth.position);
     glm::mat4 view = glm::lookAt(glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, -cam_distance), glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 10.0f);
 
@@ -73,11 +75,13 @@ void Render()
 
     glm::mat4 translatedmvp = mvp * glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, -1.0));
 
-    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(translatedmvp));
+    glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 
 void InitImGui()
 {
+    bool show_demo_window = true;
+
     const char* shading_elements[]{ "Flat", "Gouraud", "Phong" };
     int selectedItem = 0;
     // Start the Dear ImGui frame
@@ -89,7 +93,13 @@ void InitImGui()
 
     ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
 
-    ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f); 
+    ImGui::SliderFloat("Rotation Speed", &rot_speed, 10.0f, 0.2f);
+
+    ImGui::SliderFloat3("Position", glm::value_ptr(earth.position), -10.0f, 10.0f);
+    ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);
+
+    ImGui::ShowDemoWindow(&show_demo_window);
+
     ImGui::ColorEdit4("Color", (float*)& earth_color); 
 
     ImGui::Text("Stats:");
