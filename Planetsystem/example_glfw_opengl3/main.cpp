@@ -47,18 +47,17 @@ Sphere jupiter_moon(0.1f);
 // Earth
 glm::vec4 earth_color(0.0f, 0.5f, 1.0f, 1.0f);
 Sphere earth(0.5f);
-float earth_rot_speed = 1.0f;
+float earth_rot_speed = 3.0f;
 
 // Mars
 glm::vec4 mars_color(1.0f, 0.5f, 0.0f, 1.0f);
 Sphere mars(0.7f);
-float mars_rot_speed = 1.0f;
+float mars_rot_speed = 0.7f;
 
 // Jupiter
 glm::vec4 jupiter_color(1.0f, 0.3f, 0.15f, 1.0f);
 Sphere jupiter(1.0f);
-float jupiter_rot_speed = 1.0f;
-
+float jupiter_rot_speed = 0.5f;
 
 bool wireframe_enabled = false;
 
@@ -91,6 +90,7 @@ glm::mat4 mvp = glm::mat4(1.0f);
 
 int InitResources()
 {
+    camera.position = glm::vec3(0, 0, 14);
     // Sun
     sun.SetShader("sphere.v.glsl", "sphere.f.glsl");
     sun.SetColor(sun_color);
@@ -147,6 +147,7 @@ void Render()
 
     mvp = projection * view * model * anim;
 
+    uniform_mvp = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "mvp");
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
     mvp = glm::mat4(1.0f);
@@ -163,6 +164,7 @@ void Render()
 
     mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position);
 
+    uniform_mvp = glGetUniformLocation(earth.GetShader().GetShaderProgram(), "mvp");
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
     //std::cout << glm::to_string(mvp) << std::endl;
@@ -180,6 +182,7 @@ void Render()
 
     mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position + glm::vec3(3, 0, 10));
 
+    uniform_mvp = glGetUniformLocation(mars.GetShader().GetShaderProgram(), "mvp");
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
     mvp = glm::mat4(1.0f);
@@ -196,6 +199,7 @@ void Render()
 
     mvp = mvp * glm::translate(glm::mat4(1.0f), sun.position + glm::vec3(3, 0, 15));
 
+    uniform_mvp = glGetUniformLocation(jupiter.GetShader().GetShaderProgram(), "mvp");
     glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 }
 
@@ -211,8 +215,8 @@ void InitImGui()
     ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoCollapse);
 
     //ImGui::ShowDemoWindow(&show_demo_window); // Debug
-
-    ImGui::Combo("Shading", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
+    ImGui::Text("Shading");
+    ImGui::Combo("", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
     ImGui::Checkbox("Wireframe", &wireframe_enabled);
 
     ImGui::Separator();
@@ -310,6 +314,8 @@ void InitImGui()
     ImGui::Separator();
     ImGui::Text("Stats:");
     ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+    ImGui::Text("Background Color");
+    ImGui::ColorEdit4("", (float*)& background_color);
     ImGui::End();
     
     // Rendering
