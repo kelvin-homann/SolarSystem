@@ -185,11 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\misc\natvis\imgui.natvis" />
-    <None Include="lighting.f.glsl" />
+    <None Include="phong.f.glsl" />
     <None Include="sphere.f.glsl" />
     <None Include="sphere.v.glsl" />
     <None Include="packages.config" />
-    <None Include="lighting.v.glsl" />
+    <None Include="phong.v.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -99,10 +99,10 @@
     <None Include="..\..\misc\natvis\imgui.natvis">
       <Filter>imgui</Filter>
     </None>
-    <None Include="lighting.v.glsl">
+    <None Include="phong.v.glsl">
       <Filter>sources\shader</Filter>
     </None>
-    <None Include="lighting.f.glsl">
+    <None Include="phong.f.glsl">
       <Filter>sources\shader</Filter>
     </None>
   </ItemGroup>
