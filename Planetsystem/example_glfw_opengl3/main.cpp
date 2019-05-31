@@ -180,7 +180,7 @@ void Render()
     glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
     //glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(anim));
 
-    std::cout << glm::to_string(earthPos) << std::endl;
+    //std::cout << glm::to_string(earthPos) << std::endl;
 
     model = glm::mat4(1.0f);
     anim = glm::mat4(1.0f);
@@ -411,6 +411,31 @@ void framebuffer_size_callback(GLFWwindow * window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(yoffset);
+}
+
 
 int main(int, char**)
 {
@@ -430,6 +455,13 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     glfwWindowHint(GLFW_SAMPLES, 4); // Anti-Aliasing
+
+    // input
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    // tell GLFW to capture our mouse
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Icon
     GLFWimage icons[1];
