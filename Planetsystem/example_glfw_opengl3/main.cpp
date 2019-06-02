@@ -165,9 +165,9 @@ void Render()
     earth.SetColor(earth_color);
     earth.Render(screen_height, screen_width);
 
-    float earthX = earth_distance_to_sun * sin(glfwGetTime());
+    float earthX = sin(glfwGetTime()) * earth_distance_to_sun;
     float earthY = -0.3f;
-    float earthZ = earth_distance_to_sun * cos(glfwGetTime());
+    float earthZ = cos(glfwGetTime()) * earth_distance_to_sun;
     glm::vec3 earthPos = glm::vec3(earthX, earthY, earthZ);
 
     //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
@@ -190,9 +190,9 @@ void Render()
     earth_moon.SetColor(moon_color);
     earth_moon.Render(screen_height, screen_width);
 
-    float earth_moonX = moon_distance_to_earth * sin(glfwGetTime());
+    float earth_moonX = sin(glfwGetTime()) * moon_distance_to_earth;
     float earth_moonY = -0.3f;
-    float earth_moonZ = moon_distance_to_earth * cos(glfwGetTime());
+    float earth_moonZ = cos(glfwGetTime()) * moon_distance_to_earth;
     glm::vec3 earth_moonPos = glm::vec3(earth_moonX, earth_moonY, earth_moonZ);
 
     //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
@@ -213,9 +213,9 @@ void Render()
     mars.SetColor(mars_color);
     mars.Render(screen_height, screen_width);
 
-    float marsX = mars_distance_to_sun * sin(glfwGetTime());
+    float marsX = sin(glfwGetTime()) * mars_distance_to_sun;
     float marsY = -0.3f;
-    float marsZ = mars_distance_to_sun * cos(glfwGetTime());
+    float marsZ = cos(glfwGetTime()) * mars_distance_to_sun;
     glm::vec3 marsPos = glm::vec3(marsX, marsY, marsZ);
 
     //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), mars.rotation);
@@ -237,9 +237,9 @@ void Render()
     jupiter.SetColor(jupiter_color);
     jupiter.Render(screen_height, screen_width);
 
-    float jupiterX = jupiter_distance_to_sun * sin(glfwGetTime());
+    float jupiterX = sin(glfwGetTime()) * jupiter_distance_to_sun;
     float jupiterY = -0.3f;
-    float jupiterZ = jupiter_distance_to_sun * cos(glfwGetTime());
+    float jupiterZ = cos(glfwGetTime()) * jupiter_distance_to_sun;
     glm::vec3 jupiterPos = glm::vec3(jupiterX, jupiterY, jupiterZ);
 
     //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), jupiter.rotation);
@@ -256,9 +256,9 @@ void Render()
     earth_moon.SetColor(moon_color);
     earth_moon.Render(screen_height, screen_width);
 
-    float jupiter_moonX = moon_distance_to_earth * sin(glfwGetTime());
+    float jupiter_moonX = sin(glfwGetTime()) * moon_distance_to_earth;
     float jupiter_moonY = -0.3f;
-    float jupiter_moonZ = moon_distance_to_earth * cos(glfwGetTime());
+    float jupiter_moonZ = cos(glfwGetTime()) * moon_distance_to_earth;
     glm::vec3 jupiter_moonPos = glm::vec3(jupiter_moonX, jupiter_moonY, jupiter_moonZ);
 
     //anim = glm::rotate(glm::mat4(1.0f), glm::radians(angle), earth.rotation);
@@ -316,7 +316,7 @@ void InitImGui()
         ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Sun Distance", &earth_distance_to_sun, 1.0f, 20.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", (float*)& earth_color);
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& earth_color));
 
         ImGui::Checkbox("Moon", &show_earth_moon);
 
@@ -324,7 +324,7 @@ void InitImGui()
         {
             ImGui::Begin("Earth Moon Settings", &show_earth_moon, ImGuiWindowFlags_NoCollapse);
             ImGui::SliderFloat("Planet Distance", &moon_distance_to_earth, 1.0f, 20.0f);
-            ImGui::ColorEdit4("Color", (float*)& moon_color);
+            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
             ImGui::End();
         }
 
@@ -336,7 +336,7 @@ void InitImGui()
         ImGui::Begin("Mars Settings", &show_mars, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Sun Distance", &mars_distance_to_sun, 1.0f, 20.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(mars.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", (float*)& mars_color);
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& mars_color));
         ImGui::End();
     }
 
@@ -345,7 +345,7 @@ void InitImGui()
         ImGui::Begin("Jupiter Settings", &show_jupiter, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Sun Distance", &jupiter_distance_to_sun, 1.0f, 20.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(jupiter.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", (float*)& jupiter_color);
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& jupiter_color));
 
         ImGui::Checkbox("Moon", &show_jupiter_moon);
 
@@ -353,7 +353,7 @@ void InitImGui()
         {
             ImGui::Begin("Jupiter Moon Settings", &show_jupiter_moon, ImGuiWindowFlags_NoCollapse);
             ImGui::SliderFloat("Planet Distance", &jupiter_distance_to_sun, 1.0f, 20.0f);
-            ImGui::ColorEdit4("Color", (float*)& moon_color);
+            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
             ImGui::End();
         }
 
@@ -364,7 +364,7 @@ void InitImGui()
     ImGui::Text("Stats:");
     ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
     ImGui::Text("Background Color");
-    ImGui::ColorEdit4("", (float*)& background_color);
+    ImGui::ColorEdit4("", reinterpret_cast<float*>(& background_color));
     ImGui::End();
     
     // Rendering
@@ -387,7 +387,6 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -406,8 +405,6 @@ void processInput(GLFWwindow* window)
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 
@@ -457,7 +454,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_SAMPLES, 4); // Anti-Aliasing
 
     // input
-    glfwSetCursorPosCallback(window, mouse_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
@@ -493,9 +490,9 @@ int main(int, char**)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        float current_frame = glfwGetTime();
+        deltaTime = current_frame - lastFrame;
+        lastFrame = current_frame;
 
         processInput(window);
 
