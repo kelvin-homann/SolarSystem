@@ -36,10 +36,13 @@ class Sphere : public Model {
         void SetColor(glm::vec4 color);
         void BindBuffers();
 
+        void BindShader();
         void Render(int screen_height, int screen_width);
 
+        float rotationPeriod = 1.f;
+
 	private:
-		// Variablen 
+		// Variablen
 		float _radius = 0.0f;
         glm::vec4 _color = glm::vec4(1);
 		const int rings = 16;

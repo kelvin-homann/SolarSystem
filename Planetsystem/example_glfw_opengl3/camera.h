@@ -31,9 +31,7 @@ public:
     glm::vec3 up;
     glm::vec3 right;
     glm::vec3 world_up;
-    // Euler Angles
-    float Yaw;
-    float Pitch;
+
     // Camera options
     float MovementSpeed;
     float MouseSensitivity;
@@ -111,12 +109,15 @@ public:
             Zoom = 45.0f;
     }
 
-private:
+    void SetPitch(float newPitch) {
+        Pitch = newPitch;
+        updateCameraVectors();
+    }
+
     // Calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()
     {
         // Calculate the new Front vector
-        glm::vec3 front;
         front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
         front.y = sin(glm::radians(Pitch));
         front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
@@ -125,6 +126,9 @@ private:
         right = glm::normalize(glm::cross(front, world_up));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         up = glm::normalize(glm::cross(right, front));
     }
+
+    float Yaw;
+    float Pitch;
 };
 #endif
 

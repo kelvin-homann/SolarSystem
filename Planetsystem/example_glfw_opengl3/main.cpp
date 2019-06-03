@@ -44,7 +44,7 @@ float sun_rot_speed = 1.0f;
 // Moons
 glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
 Sphere earth_moon(0.1f);
-float moon_distance_to_earth = 0.1f;
+float moon_distance_to_earth = 1.f;
 Sphere jupiter_moon(0.1f);
 float moon_distance_to_jupiter = 2.0f;
 
@@ -70,6 +70,7 @@ bool wireframe_enabled = false;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
+glm::vec3 cameraOffset(0, 20, 0);
 float near_plane = 0.1f;
 float far_plane = 10.0f;
 float lastX = screen_width / 2.0f;
@@ -79,6 +80,10 @@ bool firstMouse = true;
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
+double elapsedTime = 0.0;
+double elapsedTimeScaled = 0.0;
+double lastElapsedTime = 0.0;
+float timeScale = 1.f;
 
 // Menu
 bool show_demo_window = true;
@@ -97,8 +102,10 @@ glm::mat4 mvp = glm::mat4(1.0f);
 
 int InitResources()
 {
-    camera.position = glm::vec3(0, 0, 14);
-
+    camera.position = glm::vec3(0);
+    camera.SetPitch(-90.f);
+    camera.Yaw = 0.f;
+    
     // Sun
     sun.SetShader("sphere.v.glsl", "sphere.f.glsl");
     sun.SetColor(sun_color);
@@ -134,67 +141,74 @@ int InitResources()
 
 void Render()
 {
+    lastElapsedTime = elapsedTime;
+    elapsedTime = glfwGetTime();
+    float dt = elapsedTime - lastElapsedTime;
+    float dtScaled = dt * timeScale;
+    elapsedTimeScaled += dtScaled;
+
     float angle;
     glClearColor(background_color.x, background_color.y, background_color.z, background_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    camera.updateCameraVectors();
+
+    glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled), 0.f, cos(elapsedTimeScaled)) * earth_distance_to_sun;
+    glm::vec3 earthPosAbs = sun.position + earthPosRel;
+
+    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * 2.0f), 0.f, cos(elapsedTimeScaled * 2.f)) * moon_distance_to_earth;
+    glm::vec3 moonPosAbs = earthPosAbs + moonPosRel;
+
+    camera.position = earthPosAbs + cameraOffset;
     glm::mat4 view = camera.GetViewMatrix(); // Camera
-    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 50.0f); // Projection
-    angle = (ImGui::GetTime() / sun_rot_speed) * 50;
+    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 1000.0f); // Projection
 
     // Sun
+    angle = (elapsedTimeScaled / sun_rot_speed) * 50;
+
+    sun.BindShader();
+    model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
+    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
+    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
+    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+
     sun.SetColor(sun_color);
     sun.Render(screen_height, screen_width);
+    
+    // Earth
+    angle = (elapsedTimeScaled / earth_rot_speed) * 50;
 
-    model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
+    earth.BindShader();
+    model = glm::translate(glm::mat4(1.0f), earthPosAbs);
+    model = glm::rotate(model, angle, glm::vec3(0.f, 1.f, 0.f));
 
     uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
     uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
     uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-
     glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
-    model = glm::mat4(1.0f);
-    angle = (ImGui::GetTime() / earth_rot_speed) * 50;
-    
-    // Earth
     earth.SetColor(earth_color);
     earth.Render(screen_height, screen_width);
 
-    glm::vec3 earthPos = glm::vec3(sin(glfwGetTime()) * earth_distance_to_sun, 0.f, cos(glfwGetTime()) * earth_distance_to_sun);
-
-    model = glm::translate(glm::mat4(1.0f), sun.position);
-    model = glm::translate(model, earthPos);
-    model = glm::rotate(model, angle, earthPos); // Own Rotation
-
+    // Earth Moon
+    earth_moon.BindShader();
+    model = glm::translate(glm::mat4(1.0f), moonPosAbs);
     uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
+    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
+    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
     glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
-    //std::cout << glm::to_string(earthPos) << std::endl;
-
-    model = glm::mat4(1.0f); // Resetting Model
-
-    // Earth Moon
     earth_moon.SetColor(moon_color);
     earth_moon.Render(screen_height, screen_width);
 
-    glm::vec3 earth_moonPos = glm::vec3(sin(glfwGetTime()) * moon_distance_to_earth, 0.f, cos(glfwGetTime()) * moon_distance_to_earth);
-
-    model = glm::translate(glm::mat4(1.0f), earthPos);
-    model = glm::translate(model, -earth_moonPos);
-
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
-
-    model = glm::mat4(1.0f);
-    angle = (ImGui::GetTime() / mars_rot_speed) * 50;
-
     //// Mars
+    //angle = (ImGui::GetTime() / mars_rot_speed) * 50;
     //mars.SetColor(mars_color);
     //mars.Render(screen_height, screen_width);
 
@@ -268,9 +282,15 @@ void InitImGui()
     ImGui::Checkbox("Wireframe", &wireframe_enabled);
 
     ImGui::Separator();
+    ImGui::Text("Time");
+    ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
     ImGui::Text("Camera");
     ImGui::Text("Position");
-    ImGui::SliderFloat3("", glm::value_ptr(camera.position), -20.0f, 20.0f);
+    ImGui::InputFloat3("Position", glm::value_ptr(camera.position), 2);
+    ImGui::Text("Offset");
+    ImGui::InputFloat3("Offset", glm::value_ptr(cameraOffset), 2);
+    ImGui::Text("Pitch");
+    ImGui::SliderFloat("Pitch", &camera.Pitch, -89.9999f, 89.9999f, "%.2f");
 
     ImGui::Separator();
 
@@ -283,7 +303,7 @@ void InitImGui()
     if (show_sun)
     {
         ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat3("Position", glm::value_ptr(sun.position), -10.0f, 10.0f);
+        ImGui::InputFloat3("Position", glm::value_ptr(sun.position), 2);
         ImGui::ColorEdit4("Color", (float*)& sun_color);
         ImGui::End();
     }

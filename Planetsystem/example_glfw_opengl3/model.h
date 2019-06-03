@@ -15,7 +15,7 @@ public:
     glm::mat4 GetMVP() const { return _mvp; }
     Shader GetShader() const { return shader; }
 
-    glm::vec3 position = glm::vec3(0.0, 0.0, -4.0f);
+    glm::vec3 position = glm::vec3(0.0, 0.0, 0.0f);
     glm::vec3 rotation = glm::vec3(0, 1, 0);
 private:
     glm::mat4 _model = glm::mat4(1);
