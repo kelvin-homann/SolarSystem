@@ -24,18 +24,16 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-// Global Variables
 int screen_width = 1280;
 int screen_height = 720;
 
 ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
+// Uniform Locations
 GLint uniform_model;
 GLint uniform_view;
 GLint uniform_projection;
-GLint uniform_anim;
 
-// Planets, Moons and the Sun
 // Sun
 glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
 Sphere sun(2.0f);
@@ -45,13 +43,13 @@ float sun_rot_speed = 1.0f;
 glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
 Sphere earth_moon(0.1f);
 float moon_distance_to_earth = 1.f;
-Sphere jupiter_moon(0.1f);
-float moon_distance_to_jupiter = 2.0f;
+Sphere mars_moon(0.1f);
+float moon_distance_to_mars = 2.0f;
 
 // Earth
 glm::vec4 earth_color(0.0f, 0.5f, 1.0f, 1.0f);
 Sphere earth(0.5f);
-float earth_rot_speed = 10.0f;
+float earth_rot_speed = 2.0f;
 float earth_distance_to_sun = 10.f;
 
 // Mars
@@ -60,11 +58,11 @@ Sphere mars(0.7f);
 float mars_rot_speed = 0.7f;
 float mars_distance_to_sun = 5.f;
 
-// Jupiter
-glm::vec4 jupiter_color(1.0f, 0.3f, 0.15f, 1.0f);
-Sphere jupiter(1.0f);
-float jupiter_rot_speed = 0.5f;
-float jupiter_distance_to_sun = 15.f;
+// Venus
+glm::vec4 venus_color(1.0f, 0.3f, 0.15f, 1.0f);
+Sphere venus(1.0f);
+float venus_rot_speed = 0.5f;
+float venus_distance_to_sun = 15.f;
 
 bool wireframe_enabled = false;
 
@@ -72,7 +70,7 @@ bool wireframe_enabled = false;
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 glm::vec3 cameraOffset(0, 20, 0);
 float near_plane = 0.1f;
-float far_plane = 10.0f;
+float far_plane = 1000.0f;
 float lastX = screen_width / 2.0f;
 float lastY = screen_height / 2.0f;
 bool firstMouse = true;
@@ -91,9 +89,8 @@ bool show_earth = false;
 bool show_sun = false;
 bool show_earth_moon = false;
 bool show_mars = false;
-
-bool show_jupiter = false;
-bool show_jupiter_moon = false;
+bool show_mars_moon = false;
+bool show_venus = false;
 
 glm::mat4 anim = glm::mat4(1.0f);
 glm::mat4 model = glm::mat4(1.0f);
@@ -102,7 +99,7 @@ glm::mat4 mvp = glm::mat4(1.0f);
 
 int InitResources()
 {
-    camera.position = glm::vec3(0);
+    camera.position = glm::vec3(0, 20, 0);
     camera.SetPitch(-90.f);
     camera.Yaw = 0.f;
     
@@ -127,20 +124,21 @@ int InitResources()
     mars.BindBuffers();
 
     // Jupiter
-    jupiter.SetShader("sphere.v.glsl", "sphere.f.glsl");
-    jupiter.SetColor(jupiter_color);
-    jupiter.BindBuffers();
+    venus.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    venus.SetColor(venus_color);
+    venus.BindBuffers();
 
     // Jupiter Moon
-    jupiter_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
-    jupiter_moon.SetColor(moon_color);
-    jupiter_moon.BindBuffers();
+    mars_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    mars_moon.SetColor(moon_color);
+    mars_moon.BindBuffers();
 
     return 1;
 }
 
 void Render()
 {
+    // Timing
     lastElapsedTime = elapsedTime;
     elapsedTime = glfwGetTime();
     float dt = elapsedTime - lastElapsedTime;
@@ -152,15 +150,24 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.updateCameraVectors();
 
-    glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled), 0.f, cos(elapsedTimeScaled)) * earth_distance_to_sun;
+    glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled * earth_rot_speed), 0.f, cos(elapsedTimeScaled * earth_rot_speed)) * earth_distance_to_sun;
     glm::vec3 earthPosAbs = sun.position + earthPosRel;
 
-    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * 2.0f), 0.f, cos(elapsedTimeScaled * 2.f)) * moon_distance_to_earth;
+    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * 2.0f), 0.f, cos(elapsedTimeScaled * 2.0f)) * moon_distance_to_earth;
     glm::vec3 moonPosAbs = earthPosAbs + moonPosRel;
 
-    camera.position = earthPosAbs + cameraOffset;
+    glm::vec3 marsPosRel = glm::vec3(sin(elapsedTimeScaled * mars_rot_speed), 0.f, cos(elapsedTimeScaled * mars_rot_speed)) * mars_distance_to_sun;
+    glm::vec3 marsPosAbs = sun.position + marsPosRel;
+
+    glm::vec3 marsmoonPosRel = glm::vec3(sin(elapsedTimeScaled * 3.0f), 0.f, cos(elapsedTimeScaled * 3.0f)) * moon_distance_to_mars;
+    glm::vec3 marsmoonPosAbs = marsPosAbs + marsmoonPosRel;
+
+    glm::vec3 venusPosRel = glm::vec3(sin(elapsedTimeScaled * venus_rot_speed), 0.f, cos(elapsedTimeScaled * venus_rot_speed)) * venus_distance_to_sun;
+    glm::vec3 venusPosAbs = sun.position + venusPosRel;
+
+    //camera.position = earthPosAbs + cameraOffset; // Focusing on Planet
     glm::mat4 view = camera.GetViewMatrix(); // Camera
-    projection = glm::perspective(45.0f, 1.0f * screen_width / screen_height, 0.1f, 1000.0f); // Projection
+    projection = glm::perspective(camera.Zoom, 1.0f * screen_width / screen_height, near_plane, far_plane); // Projection
 
     // Sun
     angle = (elapsedTimeScaled / sun_rot_speed) * 50;
@@ -178,11 +185,11 @@ void Render()
     sun.Render(screen_height, screen_width);
     
     // Earth
-    angle = (elapsedTimeScaled / earth_rot_speed) * 50;
+    angle = elapsedTimeScaled / earth_rot_speed;
 
     earth.BindShader();
     model = glm::translate(glm::mat4(1.0f), earthPosAbs);
-    model = glm::rotate(model, angle, glm::vec3(0.f, 1.f, 0.f));
+    model = glm::rotate(model, angle, earth.rotation);
 
     uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
     uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
@@ -207,62 +214,52 @@ void Render()
     earth_moon.SetColor(moon_color);
     earth_moon.Render(screen_height, screen_width);
 
-    //// Mars
-    //angle = (ImGui::GetTime() / mars_rot_speed) * 50;
-    //mars.SetColor(mars_color);
-    //mars.Render(screen_height, screen_width);
+    // Mars
+    angle = elapsedTimeScaled / mars_rot_speed;
 
-    //float marsX = sin(glfwGetTime()) * mars_distance_to_sun;
-    //float marsY = -0.3f;
-    //float marsZ = cos(glfwGetTime()) * mars_distance_to_sun;
-    //glm::vec3 marsPos = glm::vec3(marsX, marsY, marsZ);
+    mars.BindShader();
+    model = glm::translate(glm::mat4(1.0f), marsPosAbs);
+    model = glm::rotate(model, angle, mars.rotation);
 
-    //model = glm::translate(glm::mat4(1.0f), sun.position);
-    //model = glm::translate(model, marsPos);
+    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
+    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
+    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
-    //uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    //glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    //glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    //glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+    mars.SetColor(mars_color);
+    mars.Render(screen_height, screen_width);
 
-    //model = glm::mat4(1.0f);
-    //angle = (ImGui::GetTime() / earth_rot_speed) * 50;
+    // Mars Moon
+    mars_moon.BindShader();
+    model = glm::translate(glm::mat4(1.0f), marsmoonPosAbs);
+    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
+    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
+    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
+    mars_moon.SetColor(moon_color);
+    mars_moon.Render(screen_height, screen_width);
 
-    //// Jupiter
-    //jupiter.SetColor(jupiter_color);
-    //jupiter.Render(screen_height, screen_width);
+    // Venus
+    angle = elapsedTimeScaled / mars_rot_speed;
 
-    //float jupiterX = sin(glfwGetTime()) * jupiter_distance_to_sun;
-    //float jupiterY = -0.3f;
-    //float jupiterZ = cos(glfwGetTime()) * jupiter_distance_to_sun;
-    //glm::vec3 jupiterPos = glm::vec3(jupiterX, jupiterY, jupiterZ);
+    venus.BindShader();
+    model = glm::translate(glm::mat4(1.0f), venusPosAbs);
+    model = glm::rotate(model, angle, venus.rotation);
 
-    //model = glm::translate(glm::mat4(1.0f), sun.position);
-    //model = glm::translate(model, jupiterPos);
+    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
+    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
+    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
+    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
-    //uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    //glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    //glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    //glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
-
-    //// Jupiter Moon
-    //earth_moon.SetColor(moon_color);
-    //earth_moon.Render(screen_height, screen_width);
-
-    //float jupiter_moonX = sin(glfwGetTime()) * moon_distance_to_earth;
-    //float jupiter_moonY = -0.3f;
-    //float jupiter_moonZ = cos(glfwGetTime()) * moon_distance_to_earth;
-    //glm::vec3 jupiter_moonPos = glm::vec3(jupiter_moonX, jupiter_moonY, jupiter_moonZ);
-
-    //model = glm::translate(glm::mat4(1.0f), jupiterPos);
-    //model = glm::translate(model, jupiter_moonPos);
-
-    //uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    //glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    //glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    //glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
-
+    venus.SetColor(venus_color);
+    venus.Render(screen_height, screen_width);
 }
 
 void InitImGui()
@@ -285,12 +282,8 @@ void InitImGui()
     ImGui::Text("Time");
     ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
     ImGui::Text("Camera");
-    ImGui::Text("Position");
     ImGui::InputFloat3("Position", glm::value_ptr(camera.position), 2);
-    ImGui::Text("Offset");
-    ImGui::InputFloat3("Offset", glm::value_ptr(cameraOffset), 2);
-    ImGui::Text("Pitch");
-    ImGui::SliderFloat("Pitch", &camera.Pitch, -89.9999f, 89.9999f, "%.2f");
+    ImGui::SliderFloat("Pitch", &camera.Pitch, -89.f, 89.f, "%.2f");
 
     ImGui::Separator();
 
@@ -298,13 +291,13 @@ void InitImGui()
     ImGui::Checkbox("Sun", &show_sun); ImGui::SameLine(100);
     ImGui::Checkbox("Earth", &show_earth); 
     ImGui::Checkbox("Mars", &show_mars); ImGui::SameLine(100);
-    ImGui::Checkbox("Jupiter", &show_jupiter); 
+    ImGui::Checkbox("Venus", &show_venus); 
 
     if (show_sun)
     {
         ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
         ImGui::InputFloat3("Position", glm::value_ptr(sun.position), 2);
-        ImGui::ColorEdit4("Color", (float*)& sun_color);
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& sun_color));
         ImGui::End();
     }
 
@@ -312,6 +305,7 @@ void InitImGui()
     {
         ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Sun Distance", &earth_distance_to_sun, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &earth_rot_speed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
         ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& earth_color));
 
@@ -324,7 +318,6 @@ void InitImGui()
             ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
             ImGui::End();
         }
-
         ImGui::End();
     }
 
@@ -332,28 +325,29 @@ void InitImGui()
     {
         ImGui::Begin("Mars Settings", &show_mars, ImGuiWindowFlags_NoCollapse);
         ImGui::SliderFloat("Sun Distance", &mars_distance_to_sun, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &mars_rot_speed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(mars.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& mars_color));
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&mars_color));
+
+        ImGui::Checkbox("Moon", &show_mars_moon);
+
+        if (show_mars_moon)
+        {
+            ImGui::Begin("Mars Moon Settings", &show_mars_moon, ImGuiWindowFlags_NoCollapse);
+            ImGui::SliderFloat("Planet Distance", &moon_distance_to_mars, 1.0f, 20.0f);
+            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&moon_color));
+            ImGui::End();
+        }
         ImGui::End();
     }
 
-    if (show_jupiter)
+    if (show_venus)
     {
-        ImGui::Begin("Jupiter Settings", &show_jupiter, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Sun Distance", &jupiter_distance_to_sun, 1.0f, 20.0f);
-        ImGui::SliderFloat3("Rotation", glm::value_ptr(jupiter.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& jupiter_color));
-
-        ImGui::Checkbox("Moon", &show_jupiter_moon);
-
-        if (show_jupiter_moon)
-        {
-            ImGui::Begin("Jupiter Moon Settings", &show_jupiter_moon, ImGuiWindowFlags_NoCollapse);
-            ImGui::SliderFloat("Planet Distance", &jupiter_distance_to_sun, 1.0f, 20.0f);
-            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
-            ImGui::End();
-        }
-
+        ImGui::Begin("Mars Settings", &show_venus, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Sun Distance", &venus_distance_to_sun, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &venus_rot_speed, 1.0f, 5.0f);
+        ImGui::SliderFloat3("Rotation", glm::value_ptr(venus.rotation), -1.0f, 1.0f);;
+        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&venus_color));
         ImGui::End();
     }
 
@@ -487,7 +481,7 @@ int main(int, char**)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-        float current_frame = glfwGetTime();
+        double current_frame = glfwGetTime();
         deltaTime = current_frame - lastFrame;
         lastFrame = current_frame;
 
