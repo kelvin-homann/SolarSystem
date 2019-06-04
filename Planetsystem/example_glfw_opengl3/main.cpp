@@ -98,6 +98,7 @@ glm::mat4 projection = glm::mat4(1.0f);
 glm::mat4 mvp = glm::mat4(1.0f);
 
 glm::vec3 light_color(1.0f, 1.0f, 0.8f);
+glm::vec3 light_position(0.0f, 10.0f, 0.0f);
 
 int InitResources()
 {
@@ -179,7 +180,7 @@ void Render()
 
     sun.GetShader().setVec3("objectColor", sun_color);
     sun.GetShader().setVec3("lightColor", light_color);
-    sun.GetShader().setVec3("lightPos", sun.position);
+    sun.GetShader().setVec3("lightPos", light_position);
     sun.GetShader().setVec3("viewPos", camera.position);
     sun.GetShader().setMat4("projection", projection);
     sun.GetShader().setMat4("view", view);
@@ -204,7 +205,7 @@ void Render()
     earth.GetShader().setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
     earth.GetShader().setFloat("material.shininess", 32.0f);
 
-    earth.GetShader().setVec3("light.position", sun.position);
+    earth.GetShader().setVec3("light.position", light_position);
     earth.GetShader().setVec3("viewPos", camera.position);
     earth.GetShader().setMat4("projection", projection);
     earth.GetShader().setMat4("view", view);
@@ -216,7 +217,7 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), moonPosAbs);
     earth_moon.GetShader().setVec3("objectColor", moon_color);
     earth_moon.GetShader().setVec3("lightColor", light_color);
-    earth_moon.GetShader().setVec3("lightPos", sun.position);
+    earth_moon.GetShader().setVec3("lightPos", light_position);
     earth_moon.GetShader().setVec3("viewPos", camera.position);
     earth_moon.GetShader().setMat4("projection", projection);
     earth_moon.GetShader().setMat4("view", view);
@@ -232,7 +233,7 @@ void Render()
 
     mars.GetShader().setVec3("objectColor", mars_color);
     mars.GetShader().setVec3("lightColor", light_color);
-    mars.GetShader().setVec3("lightPos", sun.position);
+    mars.GetShader().setVec3("lightPos", light_position);
     mars.GetShader().setVec3("viewPos", camera.position);
     mars.GetShader().setMat4("projection", projection);
     mars.GetShader().setMat4("view", view);
@@ -247,7 +248,7 @@ void Render()
 
     mars_moon.GetShader().setVec3("objectColor", moon_color);
     mars_moon.GetShader().setVec3("lightColor", light_color);
-    mars_moon.GetShader().setVec3("lightPos", sun.position);
+    mars_moon.GetShader().setVec3("lightPos", light_position);
     mars_moon.GetShader().setVec3("viewPos", camera.position);
     mars_moon.GetShader().setMat4("projection", projection);
     mars_moon.GetShader().setMat4("view", view);
@@ -265,7 +266,7 @@ void Render()
 
     venus.GetShader().setVec3("objectColor", venus_color);
     venus.GetShader().setVec3("lightColor", light_color);
-    venus.GetShader().setVec3("lightPos", sun.position);
+    venus.GetShader().setVec3("lightPos", light_position);
     venus.GetShader().setVec3("viewPos", camera.position);
     venus.GetShader().setMat4("projection", projection);
     venus.GetShader().setMat4("view", view);
@@ -294,10 +295,11 @@ void InitImGui()
     ImGui::Separator();
     ImGui::Text("Time");
     ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
-    ImGui::ColorEdit3("Light", reinterpret_cast<float*>(&light_color));
+    ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light_color));
+    ImGui::SliderFloat3("Light Position", glm::value_ptr(light_position), -50.0f, 50.0f);
     ImGui::Text("Camera");
-    ImGui::InputFloat3("Position", glm::value_ptr(camera.position), 2);
-    ImGui::SliderFloat("Pitch", &camera.Pitch, -89.f, 89.f, "%.2f");
+    ImGui::InputFloat3("Camera Position", glm::value_ptr(camera.position), 2);
+    ImGui::SliderFloat("Camera Pitch", &camera.Pitch, -89.f, 89.f, "%.2f");
 
     ImGui::Separator();
 

@@ -75,11 +75,11 @@ void Sphere::Render(int screen_height, int screen_width)
 {
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, GetVBO());
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18));
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,GetIBO());
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GetIBO());
 
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
@@ -92,11 +92,11 @@ void Sphere::Render(int screen_height, int screen_width)
 
 void Sphere::BindBuffers()
 {
-    glGenBuffers(1, &_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);
-
     glGenBuffers(1, &_ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);    
 }
