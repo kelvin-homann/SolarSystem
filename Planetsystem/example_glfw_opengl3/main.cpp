@@ -99,8 +99,8 @@ glm::mat4 mvp = glm::mat4(1.0f);
 
 int InitResources()
 {
-    camera.position = glm::vec3(0, 20, 0);
-    camera.SetPitch(-90.f);
+    camera.position = glm::vec3(-30, 18, 0);
+    camera.SetPitch(-33.f);
     camera.Yaw = 0.f;
     
     // Sun
