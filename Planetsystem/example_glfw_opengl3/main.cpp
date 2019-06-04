@@ -97,39 +97,42 @@ glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 projection = glm::mat4(1.0f);
 glm::mat4 mvp = glm::mat4(1.0f);
 
+glm::vec3 light_color(1.0f, 1.0f, 0.8f);
+
 int InitResources()
 {
+    // Camera
     camera.position = glm::vec3(-30, 18, 0);
     camera.SetPitch(-33.f);
     camera.Yaw = 0.f;
     
     // Sun
-    sun.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    sun.SetShader("phong.v.glsl", "phong.f.glsl");
     sun.SetColor(sun_color);
     sun.BindBuffers();
 
     // Earth
-    earth.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    earth.SetShader("material.v.glsl", "material.f.glsl");
     earth.SetColor(earth_color);
     earth.BindBuffers();
 
     // Earth Moob
-    earth_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    earth_moon.SetShader("phong.v.glsl", "phong.f.glsl");
     earth_moon.SetColor(moon_color);
     earth_moon.BindBuffers();
 
     // Mars
-    mars.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    mars.SetShader("phong.v.glsl", "phong.f.glsl");
     mars.SetColor(mars_color);
     mars.BindBuffers();
 
     // Jupiter
-    venus.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    venus.SetShader("phong.v.glsl", "phong.f.glsl");
     venus.SetColor(venus_color);
     venus.BindBuffers();
 
     // Jupiter Moon
-    mars_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
+    mars_moon.SetShader("phong.v.glsl", "phong.f.glsl");
     mars_moon.SetColor(moon_color);
     mars_moon.BindBuffers();
 
@@ -165,23 +168,23 @@ void Render()
     glm::vec3 venusPosRel = glm::vec3(sin(elapsedTimeScaled * venus_rot_speed), 0.f, cos(elapsedTimeScaled * venus_rot_speed)) * venus_distance_to_sun;
     glm::vec3 venusPosAbs = sun.position + venusPosRel;
 
-    //camera.position = earthPosAbs + cameraOffset; // Focusing on Planet
     glm::mat4 view = camera.GetViewMatrix(); // Camera
-    projection = glm::perspective(camera.Zoom, 1.0f * screen_width / screen_height, near_plane, far_plane); // Projection
+    projection = glm::perspective(glm::radians(camera.Zoom), 1.0f * screen_width / screen_height, near_plane, far_plane); // Projection
 
     // Sun
     angle = (elapsedTimeScaled / sun_rot_speed) * 50;
 
     sun.BindShader();
     model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
 
-    sun.SetColor(sun_color);
+    sun.GetShader().setVec3("objectColor", sun_color);
+    sun.GetShader().setVec3("lightColor", light_color);
+    sun.GetShader().setVec3("lightPos", sun.position);
+    sun.GetShader().setVec3("viewPos", camera.position);
+    sun.GetShader().setMat4("projection", projection);
+    sun.GetShader().setMat4("view", view);
+    sun.GetShader().setMat4("model", model);
+
     sun.Render(screen_height, screen_width);
     
     // Earth
@@ -191,27 +194,33 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), earthPosAbs);
     model = glm::rotate(model, angle, earth.rotation);
 
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+    earth.GetShader().setVec3("light.ambient", light_color);
+    earth.GetShader().setVec3("light.diffuse", light_color);
+    earth.GetShader().setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-    earth.SetColor(earth_color);
+    // material properties
+    earth.GetShader().setVec3("material.ambient", earth_color);
+    earth.GetShader().setVec3("material.diffuse", earth_color);
+    earth.GetShader().setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
+    earth.GetShader().setFloat("material.shininess", 32.0f);
+
+    earth.GetShader().setVec3("light.position", sun.position);
+    earth.GetShader().setVec3("viewPos", camera.position);
+    earth.GetShader().setMat4("projection", projection);
+    earth.GetShader().setMat4("view", view);
+    earth.GetShader().setMat4("model", model);
     earth.Render(screen_height, screen_width);
 
     // Earth Moon
     earth_moon.BindShader();
     model = glm::translate(glm::mat4(1.0f), moonPosAbs);
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
-
-    earth_moon.SetColor(moon_color);
+    earth_moon.GetShader().setVec3("objectColor", moon_color);
+    earth_moon.GetShader().setVec3("lightColor", light_color);
+    earth_moon.GetShader().setVec3("lightPos", sun.position);
+    earth_moon.GetShader().setVec3("viewPos", camera.position);
+    earth_moon.GetShader().setMat4("projection", projection);
+    earth_moon.GetShader().setMat4("view", view);
+    earth_moon.GetShader().setMat4("model", model);
     earth_moon.Render(screen_height, screen_width);
 
     // Mars
@@ -221,12 +230,13 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), marsPosAbs);
     model = glm::rotate(model, angle, mars.rotation);
 
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+    mars.GetShader().setVec3("objectColor", mars_color);
+    mars.GetShader().setVec3("lightColor", light_color);
+    mars.GetShader().setVec3("lightPos", sun.position);
+    mars.GetShader().setVec3("viewPos", camera.position);
+    mars.GetShader().setMat4("projection", projection);
+    mars.GetShader().setMat4("view", view);
+    mars.GetShader().setMat4("model", model);
 
     mars.SetColor(mars_color);
     mars.Render(screen_height, screen_width);
@@ -234,12 +244,14 @@ void Render()
     // Mars Moon
     mars_moon.BindShader();
     model = glm::translate(glm::mat4(1.0f), marsmoonPosAbs);
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+
+    mars_moon.GetShader().setVec3("objectColor", moon_color);
+    mars_moon.GetShader().setVec3("lightColor", light_color);
+    mars_moon.GetShader().setVec3("lightPos", sun.position);
+    mars_moon.GetShader().setVec3("viewPos", camera.position);
+    mars_moon.GetShader().setMat4("projection", projection);
+    mars_moon.GetShader().setMat4("view", view);
+    mars_moon.GetShader().setMat4("model", model);
 
     mars_moon.SetColor(moon_color);
     mars_moon.Render(screen_height, screen_width);
@@ -251,12 +263,13 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), venusPosAbs);
     model = glm::rotate(model, angle, venus.rotation);
 
-    uniform_model = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "model");
-    uniform_view = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "view");
-    uniform_projection = glGetUniformLocation(sun.GetShader().GetShaderProgram(), "projection");
-    glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(projection));
+    venus.GetShader().setVec3("objectColor", venus_color);
+    venus.GetShader().setVec3("lightColor", light_color);
+    venus.GetShader().setVec3("lightPos", sun.position);
+    venus.GetShader().setVec3("viewPos", camera.position);
+    venus.GetShader().setMat4("projection", projection);
+    venus.GetShader().setMat4("view", view);
+    venus.GetShader().setMat4("model", model);
 
     venus.SetColor(venus_color);
     venus.Render(screen_height, screen_width);
@@ -281,6 +294,7 @@ void InitImGui()
     ImGui::Separator();
     ImGui::Text("Time");
     ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
+    ImGui::ColorEdit3("Light", reinterpret_cast<float*>(&light_color));
     ImGui::Text("Camera");
     ImGui::InputFloat3("Position", glm::value_ptr(camera.position), 2);
     ImGui::SliderFloat("Pitch", &camera.Pitch, -89.f, 89.f, "%.2f");
@@ -418,12 +432,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
-
 
 int main(int, char**)
 {
@@ -433,7 +445,7 @@ int main(int, char**)
         return 1;
 
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 330 core";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
@@ -443,13 +455,6 @@ int main(int, char**)
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     glfwWindowHint(GLFW_SAMPLES, 4); // Anti-Aliasing
-
-    // input
-    //glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-
-    // tell GLFW to capture our mouse
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Icon
     GLFWimage icons[1];

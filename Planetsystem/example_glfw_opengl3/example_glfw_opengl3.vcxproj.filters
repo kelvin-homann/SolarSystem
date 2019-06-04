@@ -105,5 +105,11 @@
     <None Include="phong.f.glsl">
       <Filter>sources\shader</Filter>
     </None>
+    <None Include="material.v.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
+    <None Include="material.f.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -73,43 +73,20 @@ void Sphere::BindShader()
 
 void Sphere::Render(int screen_height, int screen_width)
 {
-    GLint attribute_position, attribute_normals;
-
-    attribute_position = glGetAttribLocation(GetShader().GetShaderProgram(), "coord3d");
-    attribute_normals = glGetAttribLocation(GetShader().GetShaderProgram(), "v_color");
-
-    glUniform4f(glGetUniformLocation(GetShader().GetShaderProgram(), "ourColor"), GetColor().x, GetColor().y, GetColor().z, GetColor().w);
-
-    glEnableVertexAttribArray(attribute_position);
-    // Describe our vertices array to OpenGL (it can't guess its format automatically)
+    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, GetVBO());
-    glVertexAttribPointer(
-        attribute_position, // attribute
-        3,                 // number of elements per vertex, here (x,y,z)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    glEnableVertexAttribArray(attribute_normals);
-    glVertexAttribPointer(
-        attribute_normals, // attribute
-        3,                 // number of elements per vertex, here (R,G,B)
-        GL_FLOAT,          // the type of each element
-        GL_FALSE,          // take our values as-is
-        0,                 // no extra data between each position
-        0                  // offset of first element
-    );
-
-    /* Push each element in buffer_vertices to the vertex shader */
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)(18));
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,GetIBO());
+
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-    glDisableVertexAttribArray(attribute_position);
-    glDisableVertexAttribArray(attribute_normals);
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 }
 
 
