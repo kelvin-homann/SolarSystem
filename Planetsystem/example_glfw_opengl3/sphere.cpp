@@ -1,4 +1,5 @@
 #include "sphere.h"
+#include "soil.h"
 
 // Constructor
 Sphere::Sphere(float radius) {
@@ -81,6 +82,9 @@ void Sphere::Render(int screen_height, int screen_width)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GetIBO());
 
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2);
+
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
@@ -88,7 +92,6 @@ void Sphere::Render(int screen_height, int screen_width)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 }
-
 
 void Sphere::BindBuffers()
 {
@@ -98,5 +101,5 @@ void Sphere::BindBuffers()
 
     glGenBuffers(1, &_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);    
+    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);
 }

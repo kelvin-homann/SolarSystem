@@ -41,6 +41,8 @@ class Sphere : public Model {
 
         float rotationPeriod = 1.f;
 
+        void LoadTextures();
+
 	private:
 		// Variablen
 		float _radius = 0.0f;

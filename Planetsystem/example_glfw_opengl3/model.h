@@ -17,6 +17,7 @@ public:
 
     glm::vec3 position = glm::vec3(0.0, 0.0, 0.0f);
     glm::vec3 rotation = glm::vec3(0, 1, 0);
+    GLuint loadTexture(GLchar* path, int width, int height);
 private:
     glm::mat4 _model = glm::mat4(1);
     glm::mat4 _view = glm::mat4(1);
