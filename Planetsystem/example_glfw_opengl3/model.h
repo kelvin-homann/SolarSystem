@@ -3,11 +3,12 @@
 
 #include <GL/gl3w.h> 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "shader.h"
+#include "material.h"
 
 class Model {
 public:
@@ -18,6 +19,8 @@ public:
     glm::vec3 position = glm::vec3(0.0, 0.0, 0.0f);
     glm::vec3 rotation = glm::vec3(0, 1, 0);
     GLuint loadTexture(GLchar* path, int width, int height);
+
+    Material material = Material();
 private:
     glm::mat4 _model = glm::mat4(1);
     glm::mat4 _view = glm::mat4(1);

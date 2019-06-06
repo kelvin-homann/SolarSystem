@@ -17,6 +17,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "soil.h"
+#include "light.h"
 #include <iostream>
 
 // Legacy glf3.lib support
@@ -36,33 +37,33 @@ GLint uniform_projection;
 
 // Sun
 glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
-Sphere sun(2.0f);
+Sphere sun(10.0f);
 float sun_rot_speed = 1.0f;
 
 // Moons
 glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
-Sphere earth_moon(0.1f);
-float moon_distance_to_earth = 1.f;
-Sphere mars_moon(0.1f);
-float moon_distance_to_mars = 2.0f;
+Sphere earth_moon(1.0f);
+float earth_moon_rot_speed = 12.0f;
+float moon_distance_to_earth = 15.f;
+Sphere mars_moon(1.0f);
+float moon_distance_to_mars = 10.0f;
 
 // Earth
-glm::vec4 earth_color(0.0f, 0.5f, 1.0f, 1.0f);
-Sphere earth(0.5f);
-float earth_rot_speed = 2.0f;
-float earth_distance_to_sun = 10.f;
+Sphere earth(3.f);
+float earth_rot_speed = 1.0f;
+float earth_distance_to_sun = 70.f;
 
 // Mars
 glm::vec4 mars_color(1.0f, 0.5f, 0.0f, 1.0f);
-Sphere mars(0.7f);
+Sphere mars(2.5f);
 float mars_rot_speed = 0.7f;
-float mars_distance_to_sun = 5.f;
+float mars_distance_to_sun = 35.f;
 
 // Venus
 glm::vec4 venus_color(1.0f, 0.3f, 0.15f, 1.0f);
-Sphere venus(1.0f);
+Sphere venus(3.0f);
 float venus_rot_speed = 0.5f;
-float venus_distance_to_sun = 15.f;
+float venus_distance_to_sun = 55.f;
 
 bool wireframe_enabled = false;
 
@@ -97,44 +98,52 @@ glm::mat4 model = glm::mat4(1.0f);
 glm::mat4 projection = glm::mat4(1.0f);
 glm::mat4 mvp = glm::mat4(1.0f);
 
-glm::vec3 light_color(1.0f, 1.0f, 0.8f);
-glm::vec3 light_position(0.0f, 10.0f, 0.0f);
+// Light
+Light light = Light();
 
 int InitResources()
 {
+    // Light
+    light.position = sun.position;
+    light.color = glm::vec3(1.0f, 1.0f, 0.8f);
+    light.diffuse = glm::vec3(1.0f, 1.0f, 0.8f);
+    light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
     // Camera
-    camera.position = glm::vec3(-30, 18, 0);
-    camera.SetPitch(-33.f);
+    camera.position = glm::vec3(-140, 140, 10);
+    camera.SetPitch(-45.f);
     camera.Yaw = 0.f;
-    
+
     // Sun
-    sun.SetShader("phong.v.glsl", "phong.f.glsl");
-    sun.SetColor(sun_color);
+    sun.SetShader("material.v.glsl", "material.f.glsl");
     sun.BindBuffers();
+    sun.material.ambient = glm::vec3(1.0f, 1.0f, 0.8f);
+    sun.material.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
+    sun.material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
+    sun.material.shininess = 32.0f;
 
     // Earth
     earth.SetShader("material.v.glsl", "material.f.glsl");
-    earth.SetColor(earth_color);
     earth.BindBuffers();
+    earth.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    earth.material.diffuse = glm::vec3(0.0f, 0.5f, 1.0f);
+    earth.material.specular = glm::vec3(0.0f, 0.5f, 1.0f); 
+    earth.material.shininess = 32.0f;
 
     // Earth Moob
     earth_moon.SetShader("phong.v.glsl", "phong.f.glsl");
-    earth_moon.SetColor(moon_color);
     earth_moon.BindBuffers();
 
     // Mars
     mars.SetShader("phong.v.glsl", "phong.f.glsl");
-    mars.SetColor(mars_color);
     mars.BindBuffers();
 
     // Jupiter
     venus.SetShader("phong.v.glsl", "phong.f.glsl");
-    venus.SetColor(venus_color);
     venus.BindBuffers();
 
     // Jupiter Moon
     mars_moon.SetShader("phong.v.glsl", "phong.f.glsl");
-    mars_moon.SetColor(moon_color);
     mars_moon.BindBuffers();
 
     return 1;
@@ -157,7 +166,7 @@ void Render()
     glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled * earth_rot_speed), 0.f, cos(elapsedTimeScaled * earth_rot_speed)) * earth_distance_to_sun;
     glm::vec3 earthPosAbs = sun.position + earthPosRel;
 
-    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * 2.0f), 0.f, cos(elapsedTimeScaled * 2.0f)) * moon_distance_to_earth;
+    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * earth_moon_rot_speed), 0.f, cos(elapsedTimeScaled * earth_moon_rot_speed)) * moon_distance_to_earth;
     glm::vec3 moonPosAbs = earthPosAbs + moonPosRel;
 
     glm::vec3 marsPosRel = glm::vec3(sin(elapsedTimeScaled * mars_rot_speed), 0.f, cos(elapsedTimeScaled * mars_rot_speed)) * mars_distance_to_sun;
@@ -178,14 +187,21 @@ void Render()
     sun.BindShader();
     model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
 
-    sun.GetShader().setVec3("objectColor", sun_color);
-    sun.GetShader().setVec3("lightColor", light_color);
-    sun.GetShader().setVec3("lightPos", light_position);
+    sun.GetShader().setVec3("light.ambient", light.color);
+    sun.GetShader().setVec3("light.diffuse", light.diffuse);
+    sun.GetShader().setVec3("light.specular", light.specular);
+
+    // material properties
+    sun.GetShader().setVec3("material.ambient", sun.material.ambient);
+    sun.GetShader().setVec3("material.diffuse", sun.material.diffuse);
+    sun.GetShader().setVec3("material.specular", sun.material.specular);
+    sun.GetShader().setFloat("material.shininess", sun.material.shininess);
+
+    sun.GetShader().setVec3("light.position", light.position);
     sun.GetShader().setVec3("viewPos", camera.position);
     sun.GetShader().setMat4("projection", projection);
     sun.GetShader().setMat4("view", view);
     sun.GetShader().setMat4("model", model);
-
     sun.Render(screen_height, screen_width);
     
     // Earth
@@ -195,17 +211,17 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), earthPosAbs);
     model = glm::rotate(model, angle, earth.rotation);
 
-    earth.GetShader().setVec3("light.ambient", light_color);
-    earth.GetShader().setVec3("light.diffuse", light_color);
-    earth.GetShader().setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    earth.GetShader().setVec3("light.ambient", light.color);
+    earth.GetShader().setVec3("light.diffuse", light.diffuse);
+    earth.GetShader().setVec3("light.specular", light.specular);
 
     // material properties
-    earth.GetShader().setVec3("material.ambient", earth_color);
-    earth.GetShader().setVec3("material.diffuse", earth_color);
-    earth.GetShader().setVec3("material.specular", 0.5f, 0.5f, 0.5f); // specular lighting doesn't have full effect on this object's material
-    earth.GetShader().setFloat("material.shininess", 32.0f);
+    earth.GetShader().setVec3("material.ambient", earth.material.ambient);
+    earth.GetShader().setVec3("material.diffuse", earth.material.diffuse);
+    earth.GetShader().setVec3("material.specular", earth.material.specular);
+    earth.GetShader().setFloat("material.shininess", earth.material.shininess);
 
-    earth.GetShader().setVec3("light.position", light_position);
+    earth.GetShader().setVec3("light.position", light.position);
     earth.GetShader().setVec3("viewPos", camera.position);
     earth.GetShader().setMat4("projection", projection);
     earth.GetShader().setMat4("view", view);
@@ -216,8 +232,8 @@ void Render()
     earth_moon.BindShader();
     model = glm::translate(glm::mat4(1.0f), moonPosAbs);
     earth_moon.GetShader().setVec3("objectColor", moon_color);
-    earth_moon.GetShader().setVec3("lightColor", light_color);
-    earth_moon.GetShader().setVec3("lightPos", light_position);
+    earth_moon.GetShader().setVec3("lightColor", light.color);
+    earth_moon.GetShader().setVec3("lightPos", light.position);
     earth_moon.GetShader().setVec3("viewPos", camera.position);
     earth_moon.GetShader().setMat4("projection", projection);
     earth_moon.GetShader().setMat4("view", view);
@@ -232,8 +248,8 @@ void Render()
     model = glm::rotate(model, angle, mars.rotation);
 
     mars.GetShader().setVec3("objectColor", mars_color);
-    mars.GetShader().setVec3("lightColor", light_color);
-    mars.GetShader().setVec3("lightPos", light_position);
+    mars.GetShader().setVec3("lightColor", light.color);
+    mars.GetShader().setVec3("lightPos", light.position);
     mars.GetShader().setVec3("viewPos", camera.position);
     mars.GetShader().setMat4("projection", projection);
     mars.GetShader().setMat4("view", view);
@@ -247,8 +263,8 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), marsmoonPosAbs);
 
     mars_moon.GetShader().setVec3("objectColor", moon_color);
-    mars_moon.GetShader().setVec3("lightColor", light_color);
-    mars_moon.GetShader().setVec3("lightPos", light_position);
+    mars_moon.GetShader().setVec3("lightColor", light.color);
+    mars_moon.GetShader().setVec3("lightPos", light.position);
     mars_moon.GetShader().setVec3("viewPos", camera.position);
     mars_moon.GetShader().setMat4("projection", projection);
     mars_moon.GetShader().setMat4("view", view);
@@ -265,8 +281,8 @@ void Render()
     model = glm::rotate(model, angle, venus.rotation);
 
     venus.GetShader().setVec3("objectColor", venus_color);
-    venus.GetShader().setVec3("lightColor", light_color);
-    venus.GetShader().setVec3("lightPos", light_position);
+    venus.GetShader().setVec3("lightColor", light.color);
+    venus.GetShader().setVec3("lightPos", light.position);
     venus.GetShader().setVec3("viewPos", camera.position);
     venus.GetShader().setMat4("projection", projection);
     venus.GetShader().setMat4("view", view);
@@ -295,11 +311,15 @@ void InitImGui()
     ImGui::Separator();
     ImGui::Text("Time");
     ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
-    ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light_color));
-    ImGui::SliderFloat3("Light Position", glm::value_ptr(light_position), -50.0f, 50.0f);
+    ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light.color));
+    ImGui::SliderFloat3("Light Position", glm::value_ptr(light.position), -50.0f, 50.0f);
+    ImGui::SliderFloat3("Light Diffuse", glm::value_ptr(light.diffuse), -50.0f, 50.0f);
+    ImGui::SliderFloat3("Light Specular", glm::value_ptr(light.specular), -50.0f, 50.0f);
+
     ImGui::Text("Camera");
     ImGui::InputFloat3("Camera Position", glm::value_ptr(camera.position), 2);
     ImGui::SliderFloat("Camera Pitch", &camera.Pitch, -89.f, 89.f, "%.2f");
+    ImGui::SliderFloat("Camera Yaw", &camera.Yaw, -89.f, 89.f, "%.2f");
 
     ImGui::Separator();
 
@@ -323,7 +343,17 @@ void InitImGui()
         ImGui::SliderFloat("Sun Distance", &earth_distance_to_sun, 1.0f, 20.0f);
         ImGui::SliderFloat("Speed", &earth_rot_speed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& earth_color));
+
+        ImGui::Separator();
+
+        // Material
+        ImGui::Text("Material");
+        ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(& earth.material.ambient));
+        ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(& earth.material.diffuse));
+        ImGui::SliderFloat3("Specular", glm::value_ptr(earth.material.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess", &earth.material.shininess, 1.0f, 50.0f);
+
+        ImGui::Separator();
 
         ImGui::Checkbox("Moon", &show_earth_moon);
 
@@ -331,6 +361,7 @@ void InitImGui()
         {
             ImGui::Begin("Earth Moon Settings", &show_earth_moon, ImGuiWindowFlags_NoCollapse);
             ImGui::SliderFloat("Planet Distance", &moon_distance_to_earth, 1.0f, 20.0f);
+            ImGui::SliderFloat("Rotation Speed", &earth_moon_rot_speed, 1.0f, 20.0f);
             ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
             ImGui::End();
         }
