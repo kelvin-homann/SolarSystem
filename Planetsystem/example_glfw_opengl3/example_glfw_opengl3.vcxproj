@@ -168,6 +168,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="menu.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sphere.cpp" />
@@ -183,12 +184,15 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="menu.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\misc\natvis\imgui.natvis" />
+    <None Include="blinnphong.f.glsl" />
+    <None Include="blinnphong.v.glsl" />
     <None Include="material.f.glsl" />
     <None Include="material.v.glsl" />
     <None Include="phong.f.glsl" />

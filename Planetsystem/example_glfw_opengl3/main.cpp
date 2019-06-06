@@ -30,42 +30,23 @@ int screen_height = 720;
 
 ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-// Uniform Locations
-GLint uniform_model;
-GLint uniform_view;
-GLint uniform_projection;
-
 // Sun
 glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
 Sphere sun(10.0f);
-float sun_rot_speed = 1.0f;
-
-// Moons
-glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
-Sphere earth_moon(1.0f);
-float earth_moon_rot_speed = 12.0f;
-float moon_distance_to_earth = 15.f;
-Sphere mars_moon(1.0f);
-float moon_distance_to_mars = 10.0f;
 
 // Earth
 Sphere earth(3.f);
-float earth_rot_speed = 1.0f;
-float earth_distance_to_sun = 70.f;
+Sphere earth_moon(1.0f);
+glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
 
 // Mars
 glm::vec4 mars_color(1.0f, 0.5f, 0.0f, 1.0f);
 Sphere mars(2.5f);
-float mars_rot_speed = 0.7f;
-float mars_distance_to_sun = 35.f;
+Sphere mars_moon(1.0f);
 
 // Venus
 glm::vec4 venus_color(1.0f, 0.3f, 0.15f, 1.0f);
 Sphere venus(3.0f);
-float venus_rot_speed = 0.5f;
-float venus_distance_to_sun = 55.f;
-
-bool wireframe_enabled = false;
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -92,6 +73,7 @@ bool show_earth_moon = false;
 bool show_mars = false;
 bool show_mars_moon = false;
 bool show_venus = false;
+int rendermode_selected_item;
 
 glm::mat4 anim = glm::mat4(1.0f);
 glm::mat4 model = glm::mat4(1.0f);
@@ -101,7 +83,7 @@ glm::mat4 mvp = glm::mat4(1.0f);
 // Light
 Light light = Light();
 
-int InitResources()
+void InitResources()
 {
     // Light
     light.position = sun.position;
@@ -122,6 +104,7 @@ int InitResources()
     sun.material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
     sun.material.shininess = 32.0f;
 
+
     // Earth
     earth.SetShader("material.v.glsl", "material.f.glsl");
     earth.BindBuffers();
@@ -130,23 +113,32 @@ int InitResources()
     earth.material.specular = glm::vec3(0.0f, 0.5f, 1.0f); 
     earth.material.shininess = 32.0f;
 
-    // Earth Moob
+    earth.m_distanceToParent = 70.0f;
+    earth.m_rotSpeed = 1.0f;
+
+    // Earth Moon
     earth_moon.SetShader("phong.v.glsl", "phong.f.glsl");
     earth_moon.BindBuffers();
+    earth_moon.m_distanceToParent = 15.0f;
+    earth_moon.m_rotSpeed = 6.0f;
 
     // Mars
     mars.SetShader("phong.v.glsl", "phong.f.glsl");
     mars.BindBuffers();
+    mars.m_distanceToParent = 35.0f;
+    mars.m_rotSpeed = 0.7f;
 
-    // Jupiter
-    venus.SetShader("phong.v.glsl", "phong.f.glsl");
-    venus.BindBuffers();
-
-    // Jupiter Moon
+    // Mars Moon
     mars_moon.SetShader("phong.v.glsl", "phong.f.glsl");
     mars_moon.BindBuffers();
+    mars_moon.m_distanceToParent = 10.0f;
+    mars_moon.m_rotSpeed = 2.0f;
 
-    return 1;
+    // Venus
+    venus.SetShader("phong.v.glsl", "phong.f.glsl");
+    venus.BindBuffers();
+    venus.m_distanceToParent = 55.0f;
+    venus.m_rotSpeed = 0.5f;
 }
 
 void Render()
@@ -163,27 +155,25 @@ void Render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.updateCameraVectors();
 
-    glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled * earth_rot_speed), 0.f, cos(elapsedTimeScaled * earth_rot_speed)) * earth_distance_to_sun;
+    glm::vec3 earthPosRel = glm::vec3(sin(elapsedTimeScaled * earth.m_rotSpeed), 0.f, cos(elapsedTimeScaled * earth.m_rotSpeed)) * earth.m_distanceToParent;
     glm::vec3 earthPosAbs = sun.position + earthPosRel;
 
-    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * earth_moon_rot_speed), 0.f, cos(elapsedTimeScaled * earth_moon_rot_speed)) * moon_distance_to_earth;
+    glm::vec3 moonPosRel = glm::vec3(sin(elapsedTimeScaled * earth_moon.m_rotSpeed), 0.f, cos(elapsedTimeScaled * earth_moon.m_rotSpeed)) * earth_moon.m_distanceToParent;
     glm::vec3 moonPosAbs = earthPosAbs + moonPosRel;
 
-    glm::vec3 marsPosRel = glm::vec3(sin(elapsedTimeScaled * mars_rot_speed), 0.f, cos(elapsedTimeScaled * mars_rot_speed)) * mars_distance_to_sun;
+    glm::vec3 marsPosRel = glm::vec3(sin(elapsedTimeScaled * mars.m_rotSpeed), 0.f, cos(elapsedTimeScaled * mars.m_rotSpeed)) * mars.m_distanceToParent;
     glm::vec3 marsPosAbs = sun.position + marsPosRel;
 
-    glm::vec3 marsmoonPosRel = glm::vec3(sin(elapsedTimeScaled * 3.0f), 0.f, cos(elapsedTimeScaled * 3.0f)) * moon_distance_to_mars;
+    glm::vec3 marsmoonPosRel = glm::vec3(sin(elapsedTimeScaled * mars_moon.m_rotSpeed), 0.f, cos(elapsedTimeScaled * mars_moon.m_rotSpeed)) * mars_moon.m_distanceToParent;
     glm::vec3 marsmoonPosAbs = marsPosAbs + marsmoonPosRel;
 
-    glm::vec3 venusPosRel = glm::vec3(sin(elapsedTimeScaled * venus_rot_speed), 0.f, cos(elapsedTimeScaled * venus_rot_speed)) * venus_distance_to_sun;
+    glm::vec3 venusPosRel = glm::vec3(sin(elapsedTimeScaled * venus.m_rotSpeed), 0.f, cos(elapsedTimeScaled * venus.m_rotSpeed)) * venus.m_distanceToParent;
     glm::vec3 venusPosAbs = sun.position + venusPosRel;
 
     glm::mat4 view = camera.GetViewMatrix(); // Camera
     projection = glm::perspective(glm::radians(camera.Zoom), 1.0f * screen_width / screen_height, near_plane, far_plane); // Projection
 
     // Sun
-    angle = (elapsedTimeScaled / sun_rot_speed) * 50;
-
     sun.BindShader();
     model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
 
@@ -202,10 +192,10 @@ void Render()
     sun.GetShader().setMat4("projection", projection);
     sun.GetShader().setMat4("view", view);
     sun.GetShader().setMat4("model", model);
-    sun.Render(screen_height, screen_width);
+    sun.Render();
     
     // Earth
-    angle = elapsedTimeScaled / earth_rot_speed;
+    angle = elapsedTimeScaled / earth.m_rotSpeed;
 
     earth.BindShader();
     model = glm::translate(glm::mat4(1.0f), earthPosAbs);
@@ -226,7 +216,7 @@ void Render()
     earth.GetShader().setMat4("projection", projection);
     earth.GetShader().setMat4("view", view);
     earth.GetShader().setMat4("model", model);
-    earth.Render(screen_height, screen_width);
+    earth.Render();
 
     // Earth Moon
     earth_moon.BindShader();
@@ -238,10 +228,10 @@ void Render()
     earth_moon.GetShader().setMat4("projection", projection);
     earth_moon.GetShader().setMat4("view", view);
     earth_moon.GetShader().setMat4("model", model);
-    earth_moon.Render(screen_height, screen_width);
+    earth_moon.Render();
 
     // Mars
-    angle = elapsedTimeScaled / mars_rot_speed;
+    angle = elapsedTimeScaled / mars.m_rotSpeed;
 
     mars.BindShader();
     model = glm::translate(glm::mat4(1.0f), marsPosAbs);
@@ -256,7 +246,7 @@ void Render()
     mars.GetShader().setMat4("model", model);
 
     mars.SetColor(mars_color);
-    mars.Render(screen_height, screen_width);
+    mars.Render();
 
     // Mars Moon
     mars_moon.BindShader();
@@ -271,10 +261,10 @@ void Render()
     mars_moon.GetShader().setMat4("model", model);
 
     mars_moon.SetColor(moon_color);
-    mars_moon.Render(screen_height, screen_width);
+    mars_moon.Render();
 
     // Venus
-    angle = elapsedTimeScaled / mars_rot_speed;
+    angle = elapsedTimeScaled / mars.m_rotSpeed;
 
     venus.BindShader();
     model = glm::translate(glm::mat4(1.0f), venusPosAbs);
@@ -289,13 +279,13 @@ void Render()
     venus.GetShader().setMat4("model", model);
 
     venus.SetColor(venus_color);
-    venus.Render(screen_height, screen_width);
+    venus.Render();
 }
 
-void InitImGui()
+void RenderInterface()
 {
-    const char* shading_elements[]{ "Flat", "Gouraud", "Phong" };
-    int selectedItem = 0;
+    const char* shading_elements[]{ "Flat", "Gouraud", "Phong", "Wireframe" };
+    
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -305,16 +295,11 @@ void InitImGui()
 
     //ImGui::ShowDemoWindow(&show_demo_window); // Debug
     ImGui::Text("Shading");
-    ImGui::Combo("", &selectedItem, shading_elements, IM_ARRAYSIZE(shading_elements));
-    ImGui::Checkbox("Wireframe", &wireframe_enabled);
+    ImGui::Combo("", &rendermode_selected_item, shading_elements, IM_ARRAYSIZE(shading_elements));
 
     ImGui::Separator();
     ImGui::Text("Time");
     ImGui::SliderFloat("Time", &timeScale, 0.f, 10.f, "%.2f");
-    ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light.color));
-    ImGui::SliderFloat3("Light Position", glm::value_ptr(light.position), -50.0f, 50.0f);
-    ImGui::SliderFloat3("Light Diffuse", glm::value_ptr(light.diffuse), -50.0f, 50.0f);
-    ImGui::SliderFloat3("Light Specular", glm::value_ptr(light.specular), -50.0f, 50.0f);
 
     ImGui::Text("Camera");
     ImGui::InputFloat3("Camera Position", glm::value_ptr(camera.position), 2);
@@ -323,7 +308,7 @@ void InitImGui()
 
     ImGui::Separator();
 
-    ImGui::Text("Planets");
+    ImGui::Text("Objects");
     ImGui::Checkbox("Sun", &show_sun); ImGui::SameLine(100);
     ImGui::Checkbox("Earth", &show_earth); 
     ImGui::Checkbox("Mars", &show_mars); ImGui::SameLine(100);
@@ -333,15 +318,20 @@ void InitImGui()
     {
         ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
         ImGui::InputFloat3("Position", glm::value_ptr(sun.position), 2);
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& sun_color));
+        ImGui::ColorEdit3("Color", reinterpret_cast<float*>(& sun_color));
+        ImGui::Text("Light");
+        ImGui::SliderFloat3("Light Position", glm::value_ptr(light.position), -50.0f, 50.0f);
+        ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light.color));
+        ImGui::ColorEdit3("Light Diffuse", reinterpret_cast<float*>(&light.diffuse));
+        ImGui::SliderFloat("Light Specular", glm::value_ptr(light.specular), 0.0f, 1.0f);
         ImGui::End();
     }
 
     if (show_earth)
     {
         ImGui::Begin("Earth Settings", &show_earth, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Sun Distance", &earth_distance_to_sun, 1.0f, 20.0f);
-        ImGui::SliderFloat("Speed", &earth_rot_speed, 1.0f, 5.0f);
+        ImGui::SliderFloat("Sun Distance", &earth.m_distanceToParent, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &earth.m_rotSpeed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(earth.rotation), -1.0f, 1.0f);;
 
         ImGui::Separator();
@@ -360,9 +350,15 @@ void InitImGui()
         if (show_earth_moon)
         {
             ImGui::Begin("Earth Moon Settings", &show_earth_moon, ImGuiWindowFlags_NoCollapse);
-            ImGui::SliderFloat("Planet Distance", &moon_distance_to_earth, 1.0f, 20.0f);
-            ImGui::SliderFloat("Rotation Speed", &earth_moon_rot_speed, 1.0f, 20.0f);
-            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(& moon_color));
+            ImGui::SliderFloat("Planet Distance", &earth_moon.m_distanceToParent, 1.0f, 20.0f);
+            ImGui::SliderFloat("Rotation Speed", &earth_moon.m_rotSpeed, 1.0f, 20.0f);
+            // Material
+            ImGui::Text("Material");
+            ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(&earth_moon.material.ambient));
+            ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(&earth_moon.material.diffuse));
+            ImGui::SliderFloat3("Specular", glm::value_ptr(earth_moon.material.specular), 0.0f, 1.0f);
+            ImGui::SliderFloat("Shininess", &earth_moon.material.shininess, 1.0f, 50.0f);
+
             ImGui::End();
         }
         ImGui::End();
@@ -371,18 +367,33 @@ void InitImGui()
     if (show_mars)
     {
         ImGui::Begin("Mars Settings", &show_mars, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Sun Distance", &mars_distance_to_sun, 1.0f, 20.0f);
-        ImGui::SliderFloat("Speed", &mars_rot_speed, 1.0f, 5.0f);
+        ImGui::SliderFloat("Sun Distance", &mars.m_distanceToParent, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &mars.m_rotSpeed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(mars.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&mars_color));
+        ImGui::Separator();
 
+        // Material
+        ImGui::Text("Material");
+        ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(&mars.material.ambient));
+        ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(&mars.material.diffuse));
+        ImGui::SliderFloat3("Specular", glm::value_ptr(mars.material.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess", &mars.material.shininess, 1.0f, 50.0f);
+
+        ImGui::Separator();
         ImGui::Checkbox("Moon", &show_mars_moon);
 
         if (show_mars_moon)
         {
             ImGui::Begin("Mars Moon Settings", &show_mars_moon, ImGuiWindowFlags_NoCollapse);
-            ImGui::SliderFloat("Planet Distance", &moon_distance_to_mars, 1.0f, 20.0f);
-            ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&moon_color));
+            ImGui::SliderFloat("Planet Distance", &mars_moon.m_distanceToParent, 1.0f, 20.0f);
+            ImGui::SliderFloat("Rotation Speed", &mars_moon.m_rotSpeed, 1.0f, 20.0f);
+            // Material
+            ImGui::Text("Material");
+            ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(&mars_moon.material.ambient));
+            ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(&mars_moon.material.diffuse));
+            ImGui::SliderFloat3("Specular", glm::value_ptr(mars_moon.material.specular), 0.0f, 1.0f);
+            ImGui::SliderFloat("Shininess", &mars_moon.material.shininess, 1.0f, 50.0f);
+
             ImGui::End();
         }
         ImGui::End();
@@ -390,11 +401,21 @@ void InitImGui()
 
     if (show_venus)
     {
-        ImGui::Begin("Mars Settings", &show_venus, ImGuiWindowFlags_NoCollapse);
-        ImGui::SliderFloat("Sun Distance", &venus_distance_to_sun, 1.0f, 20.0f);
-        ImGui::SliderFloat("Speed", &venus_rot_speed, 1.0f, 5.0f);
+        ImGui::Begin("Venus Settings", &show_venus, ImGuiWindowFlags_NoCollapse);
+        ImGui::SliderFloat("Sun Distance", &venus.m_distanceToParent, 1.0f, 20.0f);
+        ImGui::SliderFloat("Speed", &venus.m_rotSpeed, 1.0f, 5.0f);
         ImGui::SliderFloat3("Rotation", glm::value_ptr(venus.rotation), -1.0f, 1.0f);;
-        ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&venus_color));
+        ImGui::Separator();
+
+        // Material
+        ImGui::Text("Material");
+        ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(&venus.material.ambient));
+        ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(&venus.material.diffuse));
+        ImGui::SliderFloat3("Specular", glm::value_ptr(venus.material.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess", &venus.material.shininess, 1.0f, 50.0f);
+
+        ImGui::Separator();
+
         ImGui::End();
     }
 
@@ -519,22 +540,25 @@ int main(int, char**)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        glViewport(0, 0, screen_width, screen_height);
         double current_frame = glfwGetTime();
         deltaTime = current_frame - lastFrame;
         lastFrame = current_frame;
 
         processInput(window);
 
-        InitImGui();
         Render();
+        RenderInterface();
         glfwMakeContextCurrent(window);
         glfwGetFramebufferSize(window, &screen_width, &screen_height);
-        glViewport(0, 0, screen_width, screen_height);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // Wireframe Mode
-        if (wireframe_enabled) {
+        if (rendermode_selected_item == 3) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         glEnable(GL_BLEND);

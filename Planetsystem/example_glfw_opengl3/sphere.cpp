@@ -72,7 +72,7 @@ void Sphere::BindShader()
     GetShader().Use(); // glUseProgram
 }
 
-void Sphere::Render(int screen_height, int screen_width)
+void Sphere::Render()
 {
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, GetVBO());

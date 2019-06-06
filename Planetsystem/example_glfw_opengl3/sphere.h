@@ -37,11 +37,10 @@ class Sphere : public Model {
         void BindBuffers();
 
         void BindShader();
-        void Render(int screen_height, int screen_width);
+        void Render();
 
-        float rotationPeriod = 1.f;
-
-        void LoadTextures();
+        float m_rotSpeed;
+        float m_distanceToParent;
 
 	private:
 		// Variablen

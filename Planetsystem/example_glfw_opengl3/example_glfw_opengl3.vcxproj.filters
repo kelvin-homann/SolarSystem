@@ -58,6 +58,9 @@
     <ClCompile Include="material.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="menu.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\imconfig.h">
@@ -99,6 +102,9 @@
     <ClInclude Include="material.h">
       <Filter>sources\header</Filter>
     </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>sources\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -121,6 +127,12 @@
       <Filter>sources\shader</Filter>
     </None>
     <None Include="material.f.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
+    <None Include="blinnphong.v.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
+    <None Include="blinnphong.f.glsl">
       <Filter>sources\shader</Filter>
     </None>
   </ItemGroup>
