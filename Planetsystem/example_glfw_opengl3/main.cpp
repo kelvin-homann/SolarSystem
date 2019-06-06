@@ -1,87 +1,9 @@
-﻿#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <stdio.h>
-
-#include <GL/gl3w.h>
-
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_ENABLE_EXPERIMENTAL // Debug
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "glm/ext.hpp" // Debug
-#include "shader.h"
-#include "sphere.h"
-#include "camera.h"
-#include "soil.h"
-#include "light.h"
-#include <iostream>
+﻿#include "main.h"
 
 // Legacy glf3.lib support
 #if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
-
-int screen_width = 1280;
-int screen_height = 720;
-
-ImVec4 background_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
-
-// Sun
-glm::vec4 sun_color(1.0f, 0.9f, 0.15f, 1.0f);
-Sphere sun(10.0f);
-
-// Earth
-Sphere earth(3.f);
-Sphere earth_moon(1.0f);
-glm::vec4 moon_color(0.5f, 0.5f, 0.5f, 1.0f);
-
-// Mars
-glm::vec4 mars_color(1.0f, 0.5f, 0.0f, 1.0f);
-Sphere mars(2.5f);
-Sphere mars_moon(1.0f);
-
-// Venus
-glm::vec4 venus_color(1.0f, 0.3f, 0.15f, 1.0f);
-Sphere venus(3.0f);
-
-// Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
-glm::vec3 cameraOffset(0, 20, 0);
-float near_plane = 0.1f;
-float far_plane = 1000.0f;
-float lastX = screen_width / 2.0f;
-float lastY = screen_height / 2.0f;
-bool firstMouse = true;
-
-// timing
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
-double elapsedTime = 0.0;
-double elapsedTimeScaled = 0.0;
-double lastElapsedTime = 0.0;
-float timeScale = 1.f;
-
-// Menu
-bool show_demo_window = true;
-bool show_earth = false;
-bool show_sun = false;
-bool show_earth_moon = false;
-bool show_mars = false;
-bool show_mars_moon = false;
-bool show_venus = false;
-int rendermode_selected_item;
-
-glm::mat4 anim = glm::mat4(1.0f);
-glm::mat4 model = glm::mat4(1.0f);
-glm::mat4 projection = glm::mat4(1.0f);
-glm::mat4 mvp = glm::mat4(1.0f);
-
-// Light
-Light light = Light();
 
 void InitResources()
 {
@@ -103,7 +25,6 @@ void InitResources()
     sun.material.diffuse = glm::vec3(0.0f, 0.0f, 0.0f);
     sun.material.specular = glm::vec3(0.0f, 0.0f, 0.0f);
     sun.material.shininess = 32.0f;
-
 
     // Earth
     earth.SetShader("material.v.glsl", "material.f.glsl");
@@ -135,7 +56,7 @@ void InitResources()
     mars_moon.m_rotSpeed = 2.0f;
 
     // Venus
-    venus.SetShader("phong.v.glsl", "phong.f.glsl");
+    venus.SetShader("sphere.v.glsl", "sphere.f.glsl");
     venus.BindBuffers();
     venus.m_distanceToParent = 55.0f;
     venus.m_rotSpeed = 0.5f;
@@ -321,7 +242,18 @@ void RenderInterface()
     {
         ImGui::Begin("Sun Settings", &show_sun, ImGuiWindowFlags_NoCollapse);
         ImGui::InputFloat3("Position", glm::value_ptr(sun.position), 2);
-        ImGui::ColorEdit3("Color", reinterpret_cast<float*>(& sun_color));
+
+        ImGui::Separator();
+
+        // Material
+        ImGui::Text("Material");
+        ImGui::ColorEdit3("Ambient", reinterpret_cast<float*>(&sun.material.ambient));
+        ImGui::ColorEdit3("Diffuse", reinterpret_cast<float*>(&sun.material.diffuse));
+        ImGui::SliderFloat3("Specular", glm::value_ptr(sun.material.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess", &sun.material.shininess, 1.0f, 50.0f);
+
+        ImGui::Separator();
+
         ImGui::Text("Light");
         ImGui::SliderFloat3("Light Position", glm::value_ptr(light.position), -50.0f, 50.0f);
         ImGui::ColorEdit3("Light Color", reinterpret_cast<float*>(&light.color));

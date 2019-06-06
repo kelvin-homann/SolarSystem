@@ -105,6 +105,9 @@
     <ClInclude Include="menu.h">
       <Filter>sources\header</Filter>
     </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>sources\header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

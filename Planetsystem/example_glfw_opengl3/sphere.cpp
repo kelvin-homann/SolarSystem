@@ -8,7 +8,7 @@ Sphere::Sphere(float radius) {
 }
 
 Sphere::~Sphere(void) {
-    glDeleteBuffers(1, &_vbo);
+    glDeleteBuffers(1, &_vbo_vertices);
     glDeleteBuffers(1, &_ibo);
 }
 
@@ -74,23 +74,23 @@ void Sphere::BindShader()
 
 void Sphere::Render()
 {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
+
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, GetVBO());
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_vertices);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
     glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_normals);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GetIBO());
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_textures);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     int size;
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
     glDrawElements(GL_TRIANGLES, size / sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
-
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
 }
 
 void Sphere::BindBuffers()
@@ -98,8 +98,20 @@ void Sphere::BindBuffers()
     glGenBuffers(1, &_ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices_, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glGenBuffers(1, &_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+    glGenBuffers(1, &_vbo_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_vertices);
     glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices_, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenBuffers(1, &_vbo_normals);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_normals);
+    glBufferData(GL_ARRAY_BUFFER, normals_size, normals_, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenBuffers(1, &_vbo_textures);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo_textures);
+    glBufferData(GL_ARRAY_BUFFER, texcoords_size, texcoords_, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

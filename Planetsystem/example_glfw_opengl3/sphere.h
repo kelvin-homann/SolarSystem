@@ -30,7 +30,7 @@ class Sphere : public Model {
         GLfloat* GetTexcoords() { return texcoords_; }
         GLuint* GetIndices() { return indices_; }
 
-        int GetVBO() const { return _vbo; }
+        int GetVBO() const { return _vbo_vertices; }
         int GetIBO() const { return _ibo; }
 
         void SetColor(glm::vec4 color);
@@ -50,8 +50,8 @@ class Sphere : public Model {
 		const int sectors = 16;
 
         GLfloat vertices_[VERTICES_COUNT_OF_SPHERE];
-        GLfloat normals_[VERTICES_COUNT_OF_SPHERE * 2];
-        GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE * 2];
+        GLfloat normals_[VERTICES_COUNT_OF_SPHERE];
+        GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE];
         GLuint indices_[INDICE_COUNT_OF_SPHERE];
 
         int vertices_size = sizeof(vertices_);
@@ -59,8 +59,10 @@ class Sphere : public Model {
         int texcoords_size = sizeof(texcoords_);
         int indices_size = sizeof(indices_);
 
-        GLuint _vbo = 0;
         GLuint _ibo = 0;
+        GLuint _vbo_vertices = 0;
+        GLuint _vbo_normals = 0;
+        GLuint _vbo_textures = 0;
 
 		void CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius);
 
