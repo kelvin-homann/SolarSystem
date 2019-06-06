@@ -92,8 +92,8 @@ void InitResources()
     light.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
     // Camera
-    camera.position = glm::vec3(-140, 140, 10);
-    camera.SetPitch(-45.f);
+    camera.position = glm::vec3(-140, 50, 10);
+    camera.SetPitch(-20.f);
     camera.Yaw = 0.f;
 
     // Sun
@@ -221,6 +221,8 @@ void Render()
     // Earth Moon
     earth_moon.BindShader();
     model = glm::translate(glm::mat4(1.0f), moonPosAbs);
+    model = glm::rotate(model, angle, earth_moon.rotation);
+
     earth_moon.GetShader().setVec3("objectColor", moon_color);
     earth_moon.GetShader().setVec3("lightColor", light.color);
     earth_moon.GetShader().setVec3("lightPos", light.position);
@@ -251,6 +253,7 @@ void Render()
     // Mars Moon
     mars_moon.BindShader();
     model = glm::translate(glm::mat4(1.0f), marsmoonPosAbs);
+    model = glm::rotate(model, angle, mars_moon.rotation);
 
     mars_moon.GetShader().setVec3("objectColor", moon_color);
     mars_moon.GetShader().setVec3("lightColor", light.color);
