@@ -3,8 +3,6 @@
 
 #include <GL/gl3w.h> 
 #include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
-//#include <glm/gtc/type_ptr.hpp>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include "shader.h"
@@ -18,15 +16,25 @@ public:
 
     glm::vec3 position = glm::vec3(0.0, 0.0, 0.0f);
     glm::vec3 rotation = glm::vec3(0, 1, 0);
-    GLuint loadTexture(GLchar* path, int width, int height);
 
+    // Texture
+    GLuint m_textureID;
+    unsigned char* m_imgData;
+    int m_texWidth;
+    int m_texHeight;
+
+    void loadTexture(GLchar* path);
+
+    // Material
     Material material = Material();
 private:
+    // Modelviewprojection
     glm::mat4 _model = glm::mat4(1);
     glm::mat4 _view = glm::mat4(1);
     glm::mat4 _projection = glm::mat4(1);
     glm::mat4 _mvp = glm::mat4(1);
 
+    // Shader
     Shader shader = Shader();
 };
 
