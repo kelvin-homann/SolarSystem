@@ -54,10 +54,10 @@ class Sphere : public Model {
         GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE];
         GLuint indices_[INDICE_COUNT_OF_SPHERE];
 
-        int vertices_size = sizeof(vertices_);
-        int normals_size = sizeof(normals_);
-        int texcoords_size = sizeof(texcoords_);
-        int indices_size = sizeof(indices_);
+        size_t vertices_size = sizeof(vertices_);
+        size_t normals_size = sizeof(normals_);
+        size_t texcoords_size = sizeof(texcoords_);
+        size_t indices_size = sizeof(indices_);
 
         GLuint _ibo = 0;
         GLuint _vbo_vertices = 0;

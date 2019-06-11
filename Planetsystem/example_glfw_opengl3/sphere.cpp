@@ -9,6 +9,8 @@ Sphere::Sphere(float radius) {
 
 Sphere::~Sphere(void) {
     glDeleteBuffers(1, &_vbo_vertices);
+    glDeleteBuffers(1, &_vbo_normals);
+    glDeleteBuffers(1, &_vbo_textures);
     glDeleteBuffers(1, &_ibo);
 }
 

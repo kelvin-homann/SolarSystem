@@ -201,6 +201,8 @@
     <None Include="sphere.v.glsl" />
     <None Include="packages.config" />
     <None Include="phong.v.glsl" />
+    <None Include="texture.f.glsl" />
+    <None Include="texture.v.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

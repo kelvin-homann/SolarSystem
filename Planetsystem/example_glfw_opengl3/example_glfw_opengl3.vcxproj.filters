@@ -138,5 +138,11 @@
     <None Include="blinnphong.f.glsl">
       <Filter>sources\shader</Filter>
     </None>
+    <None Include="texture.f.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
+    <None Include="texture.v.glsl">
+      <Filter>sources\shader</Filter>
+    </None>
   </ItemGroup>
 </Project>
