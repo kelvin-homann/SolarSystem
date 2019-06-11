@@ -46,7 +46,7 @@ Sphere venus(3.0f);
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
-glm::vec3 initPos(-25, 22, 0);
+glm::vec3 initPos(-120, 110, 0);
 glm::vec3 cameraOffset(0, 40, 0);
 float near_plane = 0.1f;
 float far_plane = 1000.0f;

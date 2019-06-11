@@ -17,34 +17,22 @@
     <Filter Include="sources\shader">
       <UniqueIdentifier>{b7361254-4fbd-45ad-8604-2b4d5f92d3d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imgui\header">
+      <UniqueIdentifier>{97720415-28f0-486b-9140-aa9112167da0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui\sources">
+      <UniqueIdentifier>{7864fad6-8e88-4f47-bad9-2b73d0e8de45}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="..\libs\gl3w\GL\gl3w.c">
       <Filter>gl3w</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="sphere.cpp">
       <Filter>sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\imgui_impl_glfw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\imgui_impl_opengl3.cpp">
-      <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="shader.cpp">
       <Filter>sources</Filter>
@@ -58,31 +46,31 @@
     <ClCompile Include="material.cpp">
       <Filter>sources</Filter>
     </ClCompile>
-    <ClCompile Include="menu.cpp">
-      <Filter>sources</Filter>
+    <ClCompile Include="..\..\imgui.cpp">
+      <Filter>imgui\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\imgui_demo.cpp">
+      <Filter>imgui\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\imgui_draw.cpp">
+      <Filter>imgui\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui_impl_glfw.cpp">
+      <Filter>imgui\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\imgui_impl_opengl3.cpp">
+      <Filter>imgui\sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\imgui_widgets.cpp">
+      <Filter>imgui\sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="..\libs\gl3w\GL\gl3w.h">
       <Filter>gl3w</Filter>
     </ClInclude>
     <ClInclude Include="..\libs\gl3w\GL\glcorearb.h">
       <Filter>gl3w</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\imgui_impl_glfw.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\imgui_impl_opengl3.h">
-      <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="sphere.h">
       <Filter>sources\header</Filter>
@@ -102,11 +90,23 @@
     <ClInclude Include="material.h">
       <Filter>sources\header</Filter>
     </ClInclude>
-    <ClInclude Include="menu.h">
-      <Filter>sources\header</Filter>
-    </ClInclude>
     <ClInclude Include="main.h">
       <Filter>sources\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\imconfig.h">
+      <Filter>imgui\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\imgui.h">
+      <Filter>imgui\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui_impl_glfw.h">
+      <Filter>imgui\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\imgui_impl_opengl3.h">
+      <Filter>imgui\header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\imgui_internal.h">
+      <Filter>imgui\header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,30 +119,6 @@
     </None>
     <None Include="..\..\misc\natvis\imgui.natvis">
       <Filter>imgui</Filter>
-    </None>
-    <None Include="phong.v.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="phong.f.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="blinnphong.v.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="blinnphong.f.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="texture.f.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="texture.v.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="gouraud.v.glsl">
-      <Filter>sources\shader</Filter>
-    </None>
-    <None Include="gouraud.f.glsl">
-      <Filter>sources\shader</Filter>
     </None>
   </ItemGroup>
 </Project>

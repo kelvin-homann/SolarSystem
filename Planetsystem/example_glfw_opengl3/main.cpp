@@ -250,7 +250,6 @@ void Render()
     venus.BindShader();
     model = glm::translate(glm::mat4(1.0f), venusPosAbs);
     model = glm::rotate(model, angle, venus.rotation);
-    glm::mat3 normalM = glm::inverseTranspose(glm::mat3(view * model));
 
     glBindTexture(GL_TEXTURE_2D, venus.m_textureID);
     venus.GetShader().setInt("ownTexture", venus.m_textureID);
@@ -461,7 +460,6 @@ void processInput(GLFWwindow* window)
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
     glViewport(0, 0, width, height);

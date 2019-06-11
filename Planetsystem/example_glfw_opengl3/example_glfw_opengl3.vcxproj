@@ -168,7 +168,6 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
-    <ClCompile Include="menu.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sphere.cpp" />
@@ -185,24 +184,15 @@
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="material.h" />
-    <ClInclude Include="menu.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\misc\natvis\imgui.natvis" />
-    <None Include="blinnphong.f.glsl" />
-    <None Include="blinnphong.v.glsl" />
-    <None Include="gouraud.f.glsl" />
-    <None Include="gouraud.v.glsl" />
-    <None Include="phong.f.glsl" />
     <None Include="sphere.f.glsl" />
     <None Include="sphere.v.glsl" />
     <None Include="packages.config" />
-    <None Include="phong.v.glsl" />
-    <None Include="texture.f.glsl" />
-    <None Include="texture.v.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
