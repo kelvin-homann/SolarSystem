@@ -274,8 +274,6 @@ void Render()
 void RenderMenu()
 {
     const char* shading_elements[]{ "Default", "Wireframe" };
-    
-    // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -429,6 +427,7 @@ void RenderMenu()
     ImGui::Render();
 }
 
+// Cleanup
 void FreeResources(GLFWwindow * window)
 {
     ImGui_ImplOpenGL3_Shutdown();
@@ -463,30 +462,6 @@ void processInput(GLFWwindow* window)
 void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
     glViewport(0, 0, width, height);
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    camera.ProcessMouseScroll(yoffset);
 }
 
 int main(int, char**)
