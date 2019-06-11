@@ -39,15 +39,15 @@ class Sphere : public Model {
         void BindShader();
         void Render();
 
-        float m_rotSpeed;
-        float m_distanceToParent;
+        float m_rotSpeed = 0;
+        float m_distanceToParent = 0;
 
 	private:
 		// Variablen
 		float _radius = 0.0f;
         glm::vec4 _color = glm::vec4(1);
-		const int rings = 16;
-		const int sectors = 16;
+		const long rings = 16;
+		const long sectors = 16;
 
         GLfloat vertices_[VERTICES_COUNT_OF_SPHERE];
         GLfloat normals_[VERTICES_COUNT_OF_SPHERE];

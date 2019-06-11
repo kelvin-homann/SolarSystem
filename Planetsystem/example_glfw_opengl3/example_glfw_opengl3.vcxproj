@@ -194,8 +194,8 @@
     <None Include="..\..\misc\natvis\imgui.natvis" />
     <None Include="blinnphong.f.glsl" />
     <None Include="blinnphong.v.glsl" />
-    <None Include="material.f.glsl" />
-    <None Include="material.v.glsl" />
+    <None Include="gouraud.f.glsl" />
+    <None Include="gouraud.v.glsl" />
     <None Include="phong.f.glsl" />
     <None Include="sphere.f.glsl" />
     <None Include="sphere.v.glsl" />

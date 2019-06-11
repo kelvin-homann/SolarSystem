@@ -32,7 +32,7 @@ void InitResources()
     earth.BindBuffers();
     earth.loadTexture("textures/earth.jpg");
     earth.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
-    earth.material.diffuse = glm::vec3(0.0f, 0.5f, 1.0f);
+    earth.material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
     earth.material.specular = glm::vec3(0.0f, 0.5f, 1.0f); 
     earth.material.shininess = 32.0f;
 
@@ -40,26 +40,47 @@ void InitResources()
     earth.m_rotSpeed = 1.0f;
 
     // Earth Moon
-    earth_moon.SetShader("phong.v.glsl", "phong.f.glsl");
+    earth_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
     earth_moon.BindBuffers();
+    earth_moon.loadTexture("textures/moon.jpg");
+    earth_moon.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    earth_moon.material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    earth_moon.material.specular = glm::vec3(0.0f, 0.5f, 1.0f);
+    earth_moon.material.shininess = 32.0f;
     earth_moon.m_distanceToParent = 15.0f;
     earth_moon.m_rotSpeed = 6.0f;
 
     // Mars
-    mars.SetShader("phong.v.glsl", "phong.f.glsl");
+    mars.SetShader("sphere.v.glsl", "sphere.f.glsl");
     mars.BindBuffers();
+    mars.loadTexture("textures/mars.jpg");
+    mars.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    mars.material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    mars.material.specular = glm::vec3(0.0f, 0.5f, 1.0f);
+    mars.material.shininess = 32.0f;
     mars.m_distanceToParent = 35.0f;
     mars.m_rotSpeed = 0.7f;
 
     // Mars Moon
-    mars_moon.SetShader("phong.v.glsl", "phong.f.glsl");
+    mars_moon.SetShader("sphere.v.glsl", "sphere.f.glsl");
     mars_moon.BindBuffers();
+    mars_moon.loadTexture("textures/moon.jpg");
+    mars_moon.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    mars_moon.material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    mars_moon.material.specular = glm::vec3(0.0f, 0.5f, 1.0f);
+    mars_moon.material.shininess = 32.0f;
     mars_moon.m_distanceToParent = 10.0f;
     mars_moon.m_rotSpeed = 2.0f;
 
     // Venus
-    venus.SetShader("phong.v.glsl", "phong.f.glsl");
+    venus.SetShader("sphere.v.glsl", "sphere.f.glsl");
     venus.BindBuffers();
+    venus.loadTexture("textures/venus.jpg");
+    venus.material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+    venus.material.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+    venus.material.specular = glm::vec3(0.0f, 0.5f, 1.0f);
+    venus.material.shininess = 32.0f;
+
     venus.m_distanceToParent = 55.0f;
     venus.m_rotSpeed = 0.5f;
 }
@@ -101,7 +122,7 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
 
     glBindTexture(GL_TEXTURE_2D, sun.m_textureID);
-    sun.GetShader().setBool("ownTexture", sun.m_textureID);
+    sun.GetShader().setInt("ownTexture", sun.m_textureID);
     sun.GetShader().setVec3("light.ambient", light.color);
     sun.GetShader().setVec3("light.diffuse", light.diffuse);
     sun.GetShader().setVec3("light.specular", light.specular);
@@ -127,7 +148,7 @@ void Render()
     model = glm::rotate(model, angle, earth.rotation);
 
     glBindTexture(GL_TEXTURE_2D, earth.m_textureID);
-    earth.GetShader().setBool("ownTexture", earth.m_textureID);
+    earth.GetShader().setInt("ownTexture", earth.m_textureID);
     earth.GetShader().setVec3("light.ambient", light.color);
     earth.GetShader().setVec3("light.diffuse", light.diffuse);
     earth.GetShader().setVec3("light.specular", light.specular);
@@ -150,9 +171,19 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), moonPosAbs);
     model = glm::rotate(model, angle, earth_moon.rotation);
 
-    earth_moon.GetShader().setVec3("objectColor", moon_color);
-    earth_moon.GetShader().setVec3("lightColor", light.color);
-    earth_moon.GetShader().setVec3("lightPos", light.position);
+    glBindTexture(GL_TEXTURE_2D, earth_moon.m_textureID);
+    earth_moon.GetShader().setInt("ownTexture", earth_moon.m_textureID);
+    earth_moon.GetShader().setVec3("light.ambient", light.color);
+    earth_moon.GetShader().setVec3("light.diffuse", light.diffuse);
+    earth_moon.GetShader().setVec3("light.specular", light.specular);
+
+    // material properties
+    earth_moon.GetShader().setVec3("material.ambient", earth_moon.material.ambient);
+    earth_moon.GetShader().setVec3("material.diffuse", earth_moon.material.diffuse);
+    earth_moon.GetShader().setVec3("material.specular", earth_moon.material.specular);
+    earth_moon.GetShader().setFloat("material.shininess", earth_moon.material.shininess);
+
+    earth_moon.GetShader().setVec3("light.position", light.position);
     earth_moon.GetShader().setVec3("viewPos", camera.position);
     earth_moon.GetShader().setMat4("projection", projection);
     earth_moon.GetShader().setMat4("view", view);
@@ -166,9 +197,19 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), marsPosAbs);
     model = glm::rotate(model, angle, mars.rotation);
 
-    mars.GetShader().setVec3("objectColor", mars_color);
-    mars.GetShader().setVec3("lightColor", light.color);
-    mars.GetShader().setVec3("lightPos", light.position);
+    glBindTexture(GL_TEXTURE_2D, mars.m_textureID);
+    mars.GetShader().setInt("ownTexture", mars.m_textureID);
+    mars.GetShader().setVec3("light.ambient", light.color);
+    mars.GetShader().setVec3("light.diffuse", light.diffuse);
+    mars.GetShader().setVec3("light.specular", light.specular);
+
+    // material properties
+    mars.GetShader().setVec3("material.ambient", mars.material.ambient);
+    mars.GetShader().setVec3("material.diffuse", mars.material.diffuse);
+    mars.GetShader().setVec3("material.specular", mars.material.specular);
+    mars.GetShader().setFloat("material.shininess", mars.material.shininess);
+
+    mars.GetShader().setVec3("light.position", light.position);
     mars.GetShader().setVec3("viewPos", camera.position);
     mars.GetShader().setMat4("projection", projection);
     mars.GetShader().setMat4("view", view);
@@ -182,9 +223,19 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), marsmoonPosAbs);
     model = glm::rotate(model, angle, mars_moon.rotation);
 
-    mars_moon.GetShader().setVec3("objectColor", moon_color);
-    mars_moon.GetShader().setVec3("lightColor", light.color);
-    mars_moon.GetShader().setVec3("lightPos", light.position);
+    glBindTexture(GL_TEXTURE_2D, mars_moon.m_textureID);
+    mars_moon.GetShader().setInt("ownTexture", mars_moon.m_textureID);
+    mars_moon.GetShader().setVec3("light.ambient", light.color);
+    mars_moon.GetShader().setVec3("light.diffuse", light.diffuse);
+    mars_moon.GetShader().setVec3("light.specular", light.specular);
+
+    // material properties
+    mars_moon.GetShader().setVec3("material.ambient", mars_moon.material.ambient);
+    mars_moon.GetShader().setVec3("material.diffuse", mars_moon.material.diffuse);
+    mars_moon.GetShader().setVec3("material.specular", mars_moon.material.specular);
+    mars_moon.GetShader().setFloat("material.shininess", mars_moon.material.shininess);
+
+    mars_moon.GetShader().setVec3("light.position", light.position);
     mars_moon.GetShader().setVec3("viewPos", camera.position);
     mars_moon.GetShader().setMat4("projection", projection);
     mars_moon.GetShader().setMat4("view", view);
@@ -199,22 +250,31 @@ void Render()
     venus.BindShader();
     model = glm::translate(glm::mat4(1.0f), venusPosAbs);
     model = glm::rotate(model, angle, venus.rotation);
+    glm::mat3 normalM = glm::inverseTranspose(glm::mat3(view * model));
 
-    venus.GetShader().setVec3("objectColor", venus_color);
-    venus.GetShader().setVec3("lightColor", light.color);
-    venus.GetShader().setVec3("lightPos", light.position);
+    glBindTexture(GL_TEXTURE_2D, venus.m_textureID);
+    venus.GetShader().setInt("ownTexture", venus.m_textureID);
+    venus.GetShader().setVec3("light.ambient", light.color);
+    venus.GetShader().setVec3("light.diffuse", light.diffuse);
+    venus.GetShader().setVec3("light.specular", light.specular);
+
+    // material properties
+    venus.GetShader().setVec3("material.ambient", venus.material.ambient);
+    venus.GetShader().setVec3("material.diffuse", venus.material.diffuse);
+    venus.GetShader().setVec3("material.specular", venus.material.specular);
+    venus.GetShader().setFloat("material.shininess", venus.material.shininess);
+
+    venus.GetShader().setVec3("light.position", light.position);
     venus.GetShader().setVec3("viewPos", camera.position);
     venus.GetShader().setMat4("projection", projection);
     venus.GetShader().setMat4("view", view);
     venus.GetShader().setMat4("model", model);
-
-    venus.SetColor(venus_color);
     venus.Render();
 }
 
 void RenderMenu()
 {
-    const char* shading_elements[]{ "Flat", "Gouraud", "Phong", "Wireframe" };
+    const char* shading_elements[]{ "Default", "Wireframe" };
     
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -439,7 +499,7 @@ int main(int, char**)
         return 1;
 
     // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 330 core";
+    const char* glsl_version = "#version 410";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
@@ -452,7 +512,7 @@ int main(int, char**)
 
     // Icon
     GLFWimage icons[1];
-    icons[0].pixels = SOIL_load_image("icon.png", &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
+    icons[0].pixels = SOIL_load_image("textures/icon.png", &icons[0].width, &icons[0].height, 0, SOIL_LOAD_RGBA);
     glfwSetWindowIcon(window, 1, icons);
     SOIL_free_image_data(icons[0].pixels);
 
@@ -502,12 +562,6 @@ int main(int, char**)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             break;
         case 1:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            break;
-        case 2:
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            break;
-        case 3:
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             break;
         default:

@@ -16,17 +16,17 @@ Sphere::~Sphere(void) {
 
 void Sphere::CreateSphere(GLfloat* vertices, GLfloat* normals, GLfloat* texcoords, GLuint* indices, float radius)
 {
-	float const R = 1. / (float)(rings - 1);
-	float const S = 1. / (float)(sectors - 1);
+    double const R = 1. / (double)(rings - 1);
+    double const S = 1. / (double)(sectors - 1);
 
 	int index = 0;
 	int uvIndex = 0;
 	int indiceIndex = 0;
 	for (int r = 0; r < rings; ++r) {
 		for (int s = 0; s < sectors; ++s) {
-			float const y = sin(-M_PI_2 + M_PI * r * R);
-			float const x = cos(2 * M_PI * s * S) * sin(M_PI * r * R);
-			float const z = sin(2 * M_PI * s * S) * sin(M_PI * r * R);
+            double const y = sin(-M_PI_2 + M_PI * r * R);
+            double const x = cos(2 * M_PI * s * S) * sin(M_PI * r * R);
+            double const z = sin(2 * M_PI * s * S) * sin(M_PI * r * R);
 
 			texcoords[uvIndex] = s * S;
 			texcoords[uvIndex + 1] = r * R;

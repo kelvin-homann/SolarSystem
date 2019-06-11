@@ -55,12 +55,12 @@ float lastY = screen_height / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
+double deltaTime = 0.0f;
+double lastFrame = 0.0f;
 double elapsedTime = 0.0;
 double elapsedTimeScaled = 0.0;
 double lastElapsedTime = 0.0;
-float timeScale = 1.f;
+float timeScale = 0.5f;
 
 // Menu
 bool show_demo_window = true;
