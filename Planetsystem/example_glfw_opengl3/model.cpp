@@ -7,7 +7,7 @@ void Model::loadTexture(GLchar* path)
 {
     //Generate texture ID and load texture data 
     glGenTextures(1, &m_textureID);
-
+    glBindTexture(GL_TEXTURE_2D, m_textureID);
     // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

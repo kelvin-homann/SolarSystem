@@ -49,9 +49,9 @@ class Sphere : public Model {
 		const long rings = 16;
 		const long sectors = 16;
 
-        GLfloat vertices_[VERTICES_COUNT_OF_SPHERE];
-        GLfloat normals_[VERTICES_COUNT_OF_SPHERE];
-        GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE];
+        GLfloat vertices_[VERTICES_COUNT_OF_SPHERE * 3];
+        GLfloat normals_[VERTICES_COUNT_OF_SPHERE * 3];
+        GLfloat texcoords_[VERTICES_COUNT_OF_SPHERE * 2];
         GLuint indices_[INDICE_COUNT_OF_SPHERE];
 
         size_t vertices_size = sizeof(vertices_);

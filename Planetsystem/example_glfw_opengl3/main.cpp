@@ -122,7 +122,7 @@ void Render()
     model = glm::translate(glm::mat4(1.0f), sun.position); // Settings Sun Position
 
     glBindTexture(GL_TEXTURE_2D, sun.m_textureID);
-    sun.GetShader().setInt("ownTexture", sun.m_textureID);
+    //sun.GetShader().setInt("ownTexture", sun.m_textureID);
     sun.GetShader().setVec3("light.ambient", light.color);
     sun.GetShader().setVec3("light.diffuse", light.diffuse);
     sun.GetShader().setVec3("light.specular", light.specular);
@@ -148,7 +148,7 @@ void Render()
     model = glm::rotate(model, angle, earth.rotation);
 
     glBindTexture(GL_TEXTURE_2D, earth.m_textureID);
-    earth.GetShader().setInt("ownTexture", earth.m_textureID);
+    //earth.GetShader().setInt("ownTexture", earth.m_textureID);
     earth.GetShader().setVec3("light.ambient", light.color);
     earth.GetShader().setVec3("light.diffuse", light.diffuse);
     earth.GetShader().setVec3("light.specular", light.specular);
@@ -172,7 +172,6 @@ void Render()
     model = glm::rotate(model, angle, earth_moon.rotation);
 
     glBindTexture(GL_TEXTURE_2D, earth_moon.m_textureID);
-    earth_moon.GetShader().setInt("ownTexture", earth_moon.m_textureID);
     earth_moon.GetShader().setVec3("light.ambient", light.color);
     earth_moon.GetShader().setVec3("light.diffuse", light.diffuse);
     earth_moon.GetShader().setVec3("light.specular", light.specular);
@@ -198,7 +197,6 @@ void Render()
     model = glm::rotate(model, angle, mars.rotation);
 
     glBindTexture(GL_TEXTURE_2D, mars.m_textureID);
-    mars.GetShader().setInt("ownTexture", mars.m_textureID);
     mars.GetShader().setVec3("light.ambient", light.color);
     mars.GetShader().setVec3("light.diffuse", light.diffuse);
     mars.GetShader().setVec3("light.specular", light.specular);
@@ -224,7 +222,6 @@ void Render()
     model = glm::rotate(model, angle, mars_moon.rotation);
 
     glBindTexture(GL_TEXTURE_2D, mars_moon.m_textureID);
-    mars_moon.GetShader().setInt("ownTexture", mars_moon.m_textureID);
     mars_moon.GetShader().setVec3("light.ambient", light.color);
     mars_moon.GetShader().setVec3("light.diffuse", light.diffuse);
     mars_moon.GetShader().setVec3("light.specular", light.specular);
@@ -252,7 +249,7 @@ void Render()
     model = glm::rotate(model, angle, venus.rotation);
 
     glBindTexture(GL_TEXTURE_2D, venus.m_textureID);
-    venus.GetShader().setInt("ownTexture", venus.m_textureID);
+    //venus.GetShader().setInt("ownTexture", venus.m_textureID);
     venus.GetShader().setVec3("light.ambient", light.color);
     venus.GetShader().setVec3("light.diffuse", light.diffuse);
     venus.GetShader().setVec3("light.specular", light.specular);
