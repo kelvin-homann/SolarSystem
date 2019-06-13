@@ -1,7 +1,7 @@
 # SolarSystem
 Small SolarSystem Simulation in OpenGL. 
 
-![animation](https://i.imgur.com/DCoeifJ.gif)
+![animation](https://i.imgur.com/TKccWZ6.gif)
 
 ### Dependencies
 
