@@ -1,5 +1,5 @@
-# SolarSystem
-Small SolarSystem Simulation in OpenGL. 
+# Planet System
+Planet System Simulation in OpenGL. 
 
 ![animation](https://i.imgur.com/TKccWZ6.gif)
 
@@ -9,6 +9,7 @@ Small SolarSystem Simulation in OpenGL.
 * PBR Shading
 * environment mapping
 * multithreading
+* obj model loading
 
 ### Dependencies
 
