@@ -17,3 +17,4 @@ Planet System Simulation in OpenGL.
 * [GLM](https://glm.g-truc.net/0.9.9/index.html)
 * [GLFW](https://www.glfw.org/)
 * [gl3w](https://github.com/skaslev/gl3w)
+* [SOIL](https://lonesock.net/soil.html)
